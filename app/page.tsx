@@ -12,8 +12,8 @@ const forms = [
     slug: "sopralluogo-fotovoltaico",
     title: "Sopralluogo Fotovoltaico",
     description: "Scheda tecnica del sopralluogo per impianto fotovoltaico.",
-    status: "draft" as const,
-    accent: "amber" as const,
+    status: "ready" as const,
+    accent: "primary" as const,
   },
   {
     slug: "sopralluogo-termico",
