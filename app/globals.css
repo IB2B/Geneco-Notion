@@ -1,26 +1,82 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-display), system-ui, -apple-system, sans-serif;
+
+  --color-bg: #f7f8fa;
+  --color-bg-elevated: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-muted: #eef1f5;
+  --color-border: #e3e7ec;
+  --color-border-strong: #c9d1dc;
+  --color-border-focus: #005189;
+
+  --color-fg: #131a23;
+  --color-fg-muted: #5b6573;
+  --color-fg-subtle: #8a929d;
+  --color-fg-inverse: #ffffff;
+
+  --color-primary: #005189;
+  --color-primary-hover: #003f6b;
+  --color-primary-soft: #dce9f1;
+  --color-primary-fg: #ffffff;
+
+  --color-accent: #ea5818;
+  --color-accent-hover: #c14411;
+  --color-accent-soft: #fde5d7;
+  --color-accent-fg: #ffffff;
+
+  --color-success: #15803d;
+  --color-success-soft: #dcfce7;
+  --color-danger: #b42318;
+  --color-danger-soft: #fee4e2;
+  --color-warning: #b45309;
+  --color-warning-soft: #fdf0dc;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+
+  --shadow-card: 0 1px 2px rgb(19 26 35 / 0.04), 0 8px 24px -12px rgb(0 81 137 / 0.10);
+  --shadow-elevated: 0 2px 4px rgb(19 26 35 / 0.04), 0 16px 40px -16px rgb(0 81 137 / 0.14);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  background: var(--color-bg);
+  color: var(--color-fg);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  font-feature-settings: "cv11", "ss01";
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.018em;
+}
+
+::selection {
+  background: var(--color-primary);
+  color: var(--color-primary-fg);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
