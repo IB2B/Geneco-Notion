@@ -26,8 +26,8 @@ const forms = [
     slug: "sopralluogo-copertura",
     title: "Sopralluogo Copertura",
     description: "Scheda tecnica della copertura: materiali, accessibilità, sicurezza.",
-    status: "draft" as const,
-    accent: "amber" as const,
+    status: "ready" as const,
+    accent: "primary" as const,
   },
 ];
 

@@ -1,18 +1,19 @@
 import { FormShell } from "@/components/form/form-shell";
-import { PendingCard } from "../_pending/pending-card";
+import { CoperturaForm } from "./copertura-form";
+import { coperturaFormConfig } from "@/lib/forms/sopralluogo-copertura/config";
 
 export const metadata = {
-  title: "Sopralluogo Copertura — Iniziativenergetiche",
+  title: "Sopralluogo Copertura — Geneco",
 };
 
 export default function SopralluogoCoperturaPage() {
   return (
     <FormShell
-      eyebrow="Sopralluogo · Bozza"
-      title="Sopralluogo Copertura"
-      subtitle="Scheda tecnica della copertura: materiali, accessibilità, sicurezza, presenza di amianto. Destinazione: Scheda Sopralluogo Copertura."
+      eyebrow="Sopralluogo · Preliminare"
+      title={coperturaFormConfig.ui.title}
+      subtitle={coperturaFormConfig.ui.subtitle}
     >
-      <PendingCard fieldCount={60} notionDb="Scheda Sopralluogo Copertura" />
+      <CoperturaForm />
     </FormShell>
   );
 }
