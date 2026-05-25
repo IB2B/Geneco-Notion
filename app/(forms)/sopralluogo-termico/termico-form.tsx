@@ -1,0 +1,770 @@
+"use client";
+
+import { useState, type ReactNode } from "react";
+import { Controller, useForm, type FieldPath } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Field } from "@/components/form/field";
+import { Input } from "@/components/ui/input";
+import { Select } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup } from "@/components/form/radio-group";
+import { CheckboxGrid } from "@/components/form/checkbox-grid";
+import {
+  WizardProgress,
+  WizardStep,
+  WizardNav,
+} from "@/components/form/wizard";
+import {
+  termicoSchema,
+  COMMERCIALE_TERMICO,
+  TIPO_EDIFICIO_TERMICO,
+  INTERVENTI_MIGLIORATIVI,
+  SI_NO,
+  COMBUSTIBILE_CALDAIA,
+  SISTEMA_EMISSIONE,
+  MATERIALE_RADIATORI,
+  TIPOLOGIA_GEN_2,
+  BOILER_ELETTRICO,
+  type TermicoFormInput,
+} from "@/lib/forms/sopralluogo-termico/schema";
+import { termicoFormConfig } from "@/lib/forms/sopralluogo-termico/config";
+
+const TOTAL_STEPS = 3;
+
+// Numeric setValueAs: empty input → undefined (so optional fields stay
+// undefined rather than NaN, which Zod would reject).
+const numberOrUndef = {
+  setValueAs: (v: unknown) =>
+    v === "" || v === null || v === undefined ? undefined : Number(v),
+};
+
+const STEP_FIELDS: ReadonlyArray<FieldPath<TermicoFormInput>[]> = [
+  ["commerciale"],
+  ["nomeCognomeCliente"],
+  [
+    "tipoEdificio",
+    "interventiMigliorativi",
+    "apeLegge10",
+    "mqPianoTerra",
+    "tempPianoTerra",
+    "mq1Piano",
+    "temp1Piano",
+    "mq2Piano",
+    "temp2Piano",
+    "mq3Piano",
+    "temp3Piano",
+    "mqSeminterrato",
+    "tempSeminterrato",
+    "mqGarage",
+    "tempGarage",
+    "altriLocaliPresenti",
+    "altriLocaliDescrizione",
+    "altriLocaliMq",
+    "altriLocaliTemp",
+    "nBagni",
+    "nResidenti",
+    "ospitiFrequenti",
+    "usoVasche",
+    "utilizzoVascheSett",
+    "lavatriceAcs",
+    "nLavatriceSett",
+    "lavastoviglieAcs",
+    "nLavastovigliaSett",
+    "caldaiaMarcaModello",
+    "condensazione",
+    "potenzaKw",
+    "anno",
+    "combustibileCaldaia",
+    "consumoCaldaia",
+    "sistemaEmissione",
+    "nRadiatori",
+    "coperturaRadiatoriMq",
+    "materialeRadiatori",
+    "nFanCoil",
+    "coperturaFanCoilMq",
+    "superficiePavSoffittoMq",
+    "generatoreBiomassa",
+    "tipologiaGen2",
+    "superficie2Gen",
+    "consumoAnnuale2Gen",
+    "dispositiviRinnovabili",
+    "pdcKw",
+    "scaldacquaPdcLitri",
+    "fotovoltaicoKwp",
+    "nPannelliSolari",
+    "accumuloSolare",
+    "capacitaAccumulo",
+    "centraleTermica",
+    "mqCentrale",
+    "ambientiFreddi",
+    "mqAmbientiFreddi",
+    "tempAmbientiFreddi",
+    "nuoviAmbienti",
+    "mqNuoviAmbienti",
+    "nuoviAmbientiPredisposizione",
+    "induzione",
+    "nUtilizziInduzione",
+    "boilerElettrico",
+    "noteSopralluogo",
+  ],
+];
+
+type SubmitResult =
+  | { status: "idle" }
+  | { status: "success"; pageUrl: string | null }
+  | { status: "error"; message: string };
+
+export function TermicoForm() {
+  const [step, setStep] = useState(1);
+  const [result, setResult] = useState<SubmitResult>({ status: "idle" });
+
+  const form = useForm<TermicoFormInput>({
+    resolver: zodResolver(termicoSchema),
+    mode: "onBlur",
+    defaultValues: {
+      commerciale: undefined,
+      nomeCognomeCliente: "",
+      tipoEdificio: undefined,
+      interventiMigliorativi: [],
+      apeLegge10: undefined,
+      mqPianoTerra: undefined as unknown as number,
+      tempPianoTerra: undefined as unknown as number,
+      altriLocaliPresenti: undefined,
+      altriLocaliDescrizione: "",
+      nBagni: undefined as unknown as number,
+      nResidenti: undefined as unknown as number,
+      ospitiFrequenti: undefined,
+      usoVasche: undefined,
+      lavatriceAcs: undefined,
+      lavastoviglieAcs: undefined,
+      caldaiaMarcaModello: "",
+      condensazione: undefined,
+      potenzaKw: undefined as unknown as number,
+      anno: undefined as unknown as number,
+      combustibileCaldaia: undefined,
+      sistemaEmissione: [],
+      materialeRadiatori: [],
+      generatoreBiomassa: undefined,
+      tipologiaGen2: [],
+      dispositiviRinnovabili: undefined,
+      accumuloSolare: undefined,
+      centraleTermica: undefined,
+      ambientiFreddi: undefined,
+      nuoviAmbienti: undefined,
+      nuoviAmbientiPredisposizione: undefined,
+      induzione: undefined,
+      boilerElettrico: undefined,
+      noteSopralluogo: "",
+      honeypot: "",
+    },
+  });
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    trigger,
+    control,
+    formState: { errors, isSubmitting },
+  } = form;
+
+  async function next() {
+    const fields = STEP_FIELDS[step - 1];
+    const ok = await trigger(fields, { shouldFocus: true });
+    if (!ok) return;
+    setStep((s) => Math.min(TOTAL_STEPS, s + 1));
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  function back() {
+    setStep((s) => Math.max(1, s - 1));
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  async function onSubmit(values: TermicoFormInput) {
+    setResult({ status: "idle" });
+    try {
+      const res = await fetch(termicoFormConfig.apiPath, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(values),
+      });
+      const data = await res.json();
+      if (res.ok && data.ok) {
+        setResult({ status: "success", pageUrl: data.pageUrl ?? null });
+        reset();
+        setStep(1);
+        return;
+      }
+      setResult({
+        status: "error",
+        message: data?.message ?? "Errore durante il salvataggio. Riprova.",
+      });
+    } catch {
+      setResult({
+        status: "error",
+        message: "Impossibile contattare il server. Controlla la connessione.",
+      });
+    }
+  }
+
+  if (result.status === "success") {
+    return (
+      <SuccessPanel
+        pageUrl={result.pageUrl}
+        onAnother={() => {
+          setResult({ status: "idle" });
+          setStep(1);
+        }}
+      />
+    );
+  }
+
+  // Read the error message for a given field path (typed helper bypasses
+  // the strict index signature of FieldErrors).
+  const errorFor = (name: FieldPath<TermicoFormInput>): string | undefined => {
+    const node = (errors as Record<string, { message?: string } | undefined>)[name];
+    return node?.message;
+  };
+
+  // Tiny render helpers to keep the long step 3 readable.
+  const numberField = (
+    name: FieldPath<TermicoFormInput>,
+    label: string,
+    opts: { placeholder?: string; required?: boolean; hint?: string } = {},
+  ) => (
+    <Field
+      label={label}
+      required={opts.required}
+      hint={opts.hint}
+      error={errorFor(name)}
+    >
+      {(props) => (
+        <Input
+          {...props}
+          type="number"
+          inputMode="numeric"
+          {...register(name, numberOrUndef)}
+          placeholder={opts.placeholder}
+        />
+      )}
+    </Field>
+  );
+
+  const siNoField = (name: FieldPath<TermicoFormInput>, label: string) => (
+    <Controller
+      control={control}
+      name={name}
+      render={({ field }) => (
+        <Field label={label} required error={errorFor(name)}>
+          {() => (
+            <RadioGroup
+              name={field.name}
+              options={SI_NO}
+              value={(field.value as string) ?? ""}
+              onChange={field.onChange}
+              invalid={Boolean(errorFor(name))}
+              columns={2}
+            />
+          )}
+        </Field>
+      )}
+    />
+  );
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} noValidate>
+      <WizardProgress current={step} total={TOTAL_STEPS} />
+
+      <StepCard>
+        {step === 1 && (
+          <WizardStep
+            stepNumber={1}
+            totalSteps={TOTAL_STEPS}
+            eyebrow="Sopralluogo Termico"
+            title="Seleziona il commerciale"
+            description="Chi sta effettuando la scheda di sopralluogo."
+          >
+            <Field
+              label="Commerciale che effettua la scheda"
+              required
+              error={errors.commerciale?.message}
+            >
+              {(props) => (
+                <Select {...props} {...register("commerciale")} defaultValue="">
+                  <option value="" disabled>
+                    Seleziona…
+                  </option>
+                  {COMMERCIALE_TERMICO.map((p) => (
+                    <option key={p} value={p}>
+                      {p}
+                    </option>
+                  ))}
+                </Select>
+              )}
+            </Field>
+          </WizardStep>
+        )}
+
+        {step === 2 && (
+          <WizardStep
+            stepNumber={2}
+            totalSteps={TOTAL_STEPS}
+            title="Cliente"
+            description="Anagrafica del cliente."
+          >
+            <Field
+              label="Inserisci il nome e cognome del cliente"
+              required
+              error={errors.nomeCognomeCliente?.message}
+            >
+              {(props) => (
+                <Input
+                  {...props}
+                  {...register("nomeCognomeCliente")}
+                  autoComplete="name"
+                  placeholder="Mario Rossi"
+                />
+              )}
+            </Field>
+          </WizardStep>
+        )}
+
+        {step === 3 && (
+          <WizardStep
+            stepNumber={3}
+            totalSteps={TOTAL_STEPS}
+            title="Dati del sopralluogo termico"
+            description="Compila ogni sezione. I campi opzionali con la dicitura 'lasciare vuoto' possono essere saltati se non applicabili."
+          >
+            <SectionHeading>Riscaldamento</SectionHeading>
+            <div className="grid gap-5">
+              <Controller
+                control={control}
+                name="tipoEdificio"
+                render={({ field }) => (
+                  <Field
+                    label="Tipologia di edificio"
+                    required
+                    error={errors.tipoEdificio?.message}
+                  >
+                    {() => (
+                      <RadioGroup
+                        name={field.name}
+                        options={TIPO_EDIFICIO_TERMICO}
+                        value={field.value ?? ""}
+                        onChange={field.onChange}
+                        invalid={Boolean(errors.tipoEdificio)}
+                        columns={2}
+                      />
+                    )}
+                  </Field>
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="interventiMigliorativi"
+                render={({ field }) => (
+                  <Field label="Interventi Migliorativi effettuati" hint="Facoltativo">
+                    {() => (
+                      <CheckboxGrid
+                        options={INTERVENTI_MIGLIORATIVI}
+                        value={field.value ?? []}
+                        onChange={field.onChange}
+                        ariaLabel="Interventi migliorativi"
+                        columns={2}
+                      />
+                    )}
+                  </Field>
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="apeLegge10"
+                render={({ field }) => (
+                  <Field label="APE - Legge 10?" required error={errors.apeLegge10?.message}>
+                    {() => (
+                      <RadioGroup
+                        name={field.name}
+                        options={SI_NO}
+                        value={field.value ?? ""}
+                        onChange={field.onChange}
+                        invalid={Boolean(errors.apeLegge10)}
+                        columns={2}
+                      />
+                    )}
+                  </Field>
+                )}
+              />
+            </div>
+
+            <SectionHeading>Abitazione</SectionHeading>
+            <div className="grid gap-5 sm:grid-cols-2">
+              {numberField("mqPianoTerra", "Mq del Piano Terra", { required: true })}
+              {numberField("tempPianoTerra", "Temperatura °C del Piano Terra", { required: true })}
+              {numberField("mq1Piano", "Mq del 1° Piano", { placeholder: "Se non presente lasciare vuoto" })}
+              {numberField("temp1Piano", "Temperatura °C del 1° Piano", { placeholder: "Se non presente lasciare vuoto" })}
+              {numberField("mq2Piano", "Mq del 2° Piano", { placeholder: "Se non presente lasciare vuoto" })}
+              {numberField("temp2Piano", "Temperatura °C del 2° Piano", { placeholder: "Se non presente lasciare vuoto" })}
+              {numberField("mq3Piano", "Mq del 3° Piano", { placeholder: "Se non presente lasciare vuoto" })}
+              {numberField("temp3Piano", "Temperatura °C del 3° Piano", { placeholder: "Se non presente lasciare vuoto" })}
+            </div>
+
+            <SectionHeading>Locali di servizio</SectionHeading>
+            <p className="-mt-2 mb-4 text-[12.5px] leading-4 text-fg-subtle">
+              Compila solo le zone riscaldate.
+            </p>
+            <div className="grid gap-5 sm:grid-cols-2">
+              {numberField("mqSeminterrato", "Mq del Seminterrato", { placeholder: "Se non presente lasciare vuoto" })}
+              {numberField("tempSeminterrato", "Temperatura °C del Seminterrato", { placeholder: "Se non presente lasciare vuoto" })}
+              {numberField("mqGarage", "Mq del Garage/Magazzino", { placeholder: "Se non presente lasciare vuoto" })}
+              {numberField("tempGarage", "Temperatura °C del Garage/Magazzino", { placeholder: "Se non presente lasciare vuoto" })}
+            </div>
+            <div className="mt-5">{siNoField("altriLocaliPresenti", "Sono presenti altri locali?")}</div>
+            <div className="mt-5 grid gap-5 sm:grid-cols-2">
+              <Field
+                label="Descrivi il locale aggiuntivo"
+                hint="Se non presenti lasciare vuoto"
+                error={errors.altriLocaliDescrizione?.message}
+                className="sm:col-span-2"
+              >
+                {(props) => (
+                  <Input
+                    {...props}
+                    {...register("altriLocaliDescrizione")}
+                    placeholder="Es. Mansarda, Studio, …"
+                  />
+                )}
+              </Field>
+              {numberField("altriLocaliMq", "Mq del locale aggiuntivo", { placeholder: "Se non presente lasciare vuoto" })}
+              {numberField("altriLocaliTemp", "Temperatura °C del locale aggiuntivo", { placeholder: "Se non presente lasciare vuoto" })}
+            </div>
+
+            <SectionHeading>Acqua calda sanitaria</SectionHeading>
+            <div className="grid gap-5 sm:grid-cols-2">
+              {numberField("nBagni", "n° di Bagni", { required: true })}
+              {numberField("nResidenti", "n° di Residenti", { required: true })}
+              {siNoField("ospitiFrequenti", "Ci sono ospiti frequenti?")}
+              {siNoField("usoVasche", "Fanno uso di vasche?")}
+              {numberField("utilizzoVascheSett", "n° utilizzo vasche medio settimanale", { placeholder: "Se no inserire 0" })}
+              {siNoField("lavatriceAcs", "La lavatrice è collegata al sistema ACS?")}
+              {numberField("nLavatriceSett", "n° utilizzo settimanale lavatrice", { placeholder: "Se no inserire 0" })}
+              {siNoField("lavastoviglieAcs", "La lavastoviglie è collegata al sistema ACS?")}
+              {numberField("nLavastovigliaSett", "n° utilizzo settimanale lavastoviglie", { placeholder: "Se no inserire 0" })}
+            </div>
+
+            <SectionHeading>Impianto di riscaldamento principale</SectionHeading>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Field
+                label="Marca e Modello della Caldaia"
+                required
+                error={errors.caldaiaMarcaModello?.message}
+                className="sm:col-span-2"
+              >
+                {(props) => (
+                  <Input {...props} {...register("caldaiaMarcaModello")} placeholder="Es. Vaillant ecoTEC plus" />
+                )}
+              </Field>
+              {siNoField("condensazione", "La caldaia è a condensazione?")}
+              {numberField("potenzaKw", "Potenza in kW", { required: true })}
+              {numberField("anno", "Anno", { required: true, placeholder: "2018" })}
+              <Field
+                label="Combustibile della caldaia"
+                required
+                error={errors.combustibileCaldaia?.message}
+              >
+                {(props) => (
+                  <Select {...props} {...register("combustibileCaldaia")} defaultValue="">
+                    <option value="" disabled>
+                      Seleziona…
+                    </option>
+                    {COMBUSTIBILE_CALDAIA.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </Select>
+                )}
+              </Field>
+              {numberField("consumoCaldaia", "Consumo kg/litri 12 mesi", {
+                placeholder: "Se a Metano lasciare vuoto",
+              })}
+              <Controller
+                control={control}
+                name="sistemaEmissione"
+                render={({ field }) => (
+                  <Field
+                    label="Sistema di emissione"
+                    required
+                    error={errors.sistemaEmissione?.message}
+                    className="sm:col-span-2"
+                  >
+                    {() => (
+                      <CheckboxGrid
+                        options={SISTEMA_EMISSIONE}
+                        value={field.value ?? []}
+                        onChange={field.onChange}
+                        ariaLabel="Sistema di emissione"
+                        columns={2}
+                      />
+                    )}
+                  </Field>
+                )}
+              />
+              {numberField("nRadiatori", "n° di Radiatori", { placeholder: "Se non presente lasciare vuoto" })}
+              {numberField("coperturaRadiatoriMq", "Mq di copertura dei Radiatori", { placeholder: "Se non presente lasciare vuoto" })}
+              <Controller
+                control={control}
+                name="materialeRadiatori"
+                render={({ field }) => (
+                  <Field label="Materiale dei radiatori" hint="Facoltativo" className="sm:col-span-2">
+                    {() => (
+                      <CheckboxGrid
+                        options={MATERIALE_RADIATORI}
+                        value={field.value ?? []}
+                        onChange={field.onChange}
+                        ariaLabel="Materiale dei radiatori"
+                        columns={2}
+                      />
+                    )}
+                  </Field>
+                )}
+              />
+              {numberField("nFanCoil", "n° di Fan Coil", { placeholder: "Se non presente lasciare vuoto" })}
+              {numberField("coperturaFanCoilMq", "Mq di copertura dei Fan Coil", { placeholder: "Se non presente lasciare vuoto" })}
+              {numberField("superficiePavSoffittoMq", "Superficie pavimento/soffitto (mq)", { placeholder: "Se non presente lasciare vuoto" })}
+            </div>
+
+            <SectionHeading>Impianto di riscaldamento secondario</SectionHeading>
+            <div className="grid gap-5 sm:grid-cols-2">
+              {siNoField("generatoreBiomassa", "Generatore secondario a biomassa?")}
+              <Controller
+                control={control}
+                name="tipologiaGen2"
+                render={({ field }) => (
+                  <Field label="Tipologia del generatore secondario" hint="Facoltativo">
+                    {() => (
+                      <CheckboxGrid
+                        options={TIPOLOGIA_GEN_2}
+                        value={field.value ?? []}
+                        onChange={field.onChange}
+                        ariaLabel="Tipologia generatore secondario"
+                        columns={2}
+                      />
+                    )}
+                  </Field>
+                )}
+              />
+              {numberField("superficie2Gen", "Superficie riscaldata dal 2° generatore (mq)", { placeholder: "Se non presente lasciare vuoto" })}
+              {numberField("consumoAnnuale2Gen", "Consumo annuale legna/pellet (kg)", { placeholder: "Se non presente lasciare vuoto" })}
+            </div>
+
+            <SectionHeading>Energia rinnovabile</SectionHeading>
+            <div className="grid gap-5 sm:grid-cols-2">
+              {siNoField("dispositiviRinnovabili", "Dispositivi di energia rinnovabile?")}
+              {numberField("pdcKw", "Pdc in kW", { placeholder: "Se non presente 0" })}
+              {numberField("scaldacquaPdcLitri", "Scaldacqua Pdc (litri)", { placeholder: "Se non presente 0" })}
+              {numberField("fotovoltaicoKwp", "Fotovoltaico kWp", { placeholder: "Se non presente 0" })}
+              {numberField("nPannelliSolari", "n° Pannelli Solari Termici", { placeholder: "Se non presente 0" })}
+              {siNoField("accumuloSolare", "È previsto accumulo solare?")}
+              {numberField("capacitaAccumulo", "Capacità accumulo (litri)", { placeholder: "Se non presente 0" })}
+            </div>
+
+            <SectionHeading>Centrale termica</SectionHeading>
+            <div className="grid gap-5 sm:grid-cols-2">
+              {siNoField("centraleTermica", "È presente la centrale termica?")}
+              {numberField("mqCentrale", "Mq netti della centrale", { placeholder: "Se non presente 0" })}
+            </div>
+
+            <SectionHeading>Altre informazioni</SectionHeading>
+            <div className="grid gap-5 sm:grid-cols-2">
+              {siNoField("ambientiFreddi", "Ambienti freddi da migliorare?")}
+              {numberField("mqAmbientiFreddi", "Mq ambiente da migliorare", { placeholder: "Se non presente 0" })}
+              {numberField("tempAmbientiFreddi", "Temperatura attuale ambiente freddo (°C)", { placeholder: "Se non presente 0" })}
+              {siNoField("nuoviAmbienti", "Nuovi ambienti da riscaldare?")}
+              {numberField("mqNuoviAmbienti", "Mq dell'ambiente nuovo", { placeholder: "Se non presente 0" })}
+              {siNoField("nuoviAmbientiPredisposizione", "Predisposizione presente nei nuovi ambienti?")}
+            </div>
+
+            <SectionHeading>Boiler e induzione</SectionHeading>
+            <div className="grid gap-5 sm:grid-cols-2">
+              {siNoField("induzione", "È presente l'induzione?")}
+              {numberField("nUtilizziInduzione", "n° giornaliero utilizzo induzione", { placeholder: "Se non presente 0" })}
+              <Controller
+                control={control}
+                name="boilerElettrico"
+                render={({ field }) => (
+                  <Field
+                    label="È presente un boiler elettrico?"
+                    required
+                    error={errors.boilerElettrico?.message}
+                    className="sm:col-span-2"
+                  >
+                    {() => (
+                      <RadioGroup
+                        name={field.name}
+                        options={BOILER_ELETTRICO}
+                        value={field.value ?? ""}
+                        onChange={field.onChange}
+                        invalid={Boolean(errors.boilerElettrico)}
+                        columns={2}
+                      />
+                    )}
+                  </Field>
+                )}
+              />
+            </div>
+
+            <SectionHeading>Note e allegati</SectionHeading>
+            <Field
+              label="Inserisci eventuali note"
+              required
+              error={errors.noteSopralluogo?.message}
+            >
+              {(props) => (
+                <Textarea
+                  {...props}
+                  {...register("noteSopralluogo")}
+                  rows={4}
+                  placeholder="Annotazioni sul sopralluogo"
+                />
+              )}
+            </Field>
+            <FileUploadsDisabled />
+          </WizardStep>
+        )}
+
+        <WizardNav
+          current={step}
+          total={TOTAL_STEPS}
+          onBack={back}
+          onNext={next}
+          isSubmitting={isSubmitting}
+          submitLabel={termicoFormConfig.ui.submitLabel}
+        />
+      </StepCard>
+
+      <div aria-hidden className="absolute left-[-9999px] top-auto h-px w-px overflow-hidden">
+        <label>
+          Lascia vuoto
+          <input type="text" tabIndex={-1} autoComplete="off" {...register("honeypot")} />
+        </label>
+      </div>
+
+      {result.status === "error" && (
+        <div className="mt-5 rounded-[14px] border border-danger/20 bg-danger-soft px-5 py-4 text-danger">
+          <p className="text-[14px] font-semibold leading-5">Salvataggio non riuscito</p>
+          <p className="mt-1 text-[13.5px] leading-5 opacity-90">{result.message}</p>
+        </div>
+      )}
+    </form>
+  );
+}
+
+function StepCard({ children }: { children: ReactNode }) {
+  return (
+    <div className="rounded-[20px] border border-border bg-surface px-6 py-7 shadow-[var(--shadow-card)] sm:px-8 sm:py-9">
+      {children}
+    </div>
+  );
+}
+
+function SectionHeading({ children }: { children: ReactNode }) {
+  return (
+    <h3 className="mb-4 mt-7 font-display text-[14px] font-semibold uppercase tracking-[0.12em] text-fg-muted first:mt-0">
+      {children}
+    </h3>
+  );
+}
+
+function FileUploadsDisabled() {
+  const uploads = [
+    "Bolletta Elettrica",
+    "Bolletta del Gas",
+    "Fatture integrative caldaia (12 mesi)",
+    "Fatture integrative 2° generatore",
+    "File APE - Legge 10",
+    "Foto Esterne",
+    "Foto Serramenti",
+    "Foto Radiatori",
+    "Foto Caldaia",
+    "Foto Targa Caldaia",
+    "Foto Cabina di Media",
+    "Foto Centrale Termica",
+    "Disegni e Planimetrie",
+  ];
+  return (
+    <section className="mt-6 rounded-[14px] border border-dashed border-border-strong bg-surface-muted/70 px-5 py-5">
+      <h4 className="font-display text-[13px] font-semibold uppercase tracking-[0.12em] text-fg-muted">
+        Allegati foto e documenti — in arrivo
+      </h4>
+      <p className="mt-1.5 text-[13px] leading-5 text-fg-muted">
+        I caricamenti foto/bolletta del modulo Tally saranno disponibili dopo
+        l&apos;attivazione dello storage esterno. Puoi caricarli manualmente nella
+        scheda Notion una volta salvata.
+      </p>
+      <ul className="mt-3 grid grid-cols-1 gap-1.5 text-[12.5px] text-fg-subtle sm:grid-cols-2">
+        {uploads.map((u) => (
+          <li key={u} className="flex items-center gap-2">
+            <svg aria-hidden viewBox="0 0 16 16" className="size-3.5" fill="none">
+              <path d="M3 8h10M8 3v10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            </svg>
+            {u}
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function SuccessPanel({
+  pageUrl,
+  onAnother,
+}: {
+  pageUrl: string | null;
+  onAnother: () => void;
+}) {
+  return (
+    <div className="rounded-[20px] border border-success/20 bg-success-soft px-6 py-10 text-success sm:px-10 sm:py-14">
+      <div className="mx-auto max-w-md text-center">
+        <span
+          aria-hidden
+          className="mx-auto mb-5 inline-flex size-12 items-center justify-center rounded-full bg-success text-white"
+        >
+          <svg viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="2.4">
+            <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </span>
+        <h2 className="font-display text-[22px] font-semibold leading-7">
+          Sopralluogo termico salvato.
+        </h2>
+        <p className="mt-2 text-[14px] leading-5 opacity-90">
+          La scheda è stata creata nel database Schede S. Termico su Notion.
+        </p>
+        <div className="mt-7 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+          {pageUrl && (
+            <a
+              href={pageUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-11 items-center gap-2 rounded-[12px] bg-success px-5 text-[14px] font-medium text-white hover:bg-success/90 transition-colors"
+            >
+              Apri in Notion
+              <svg aria-hidden viewBox="0 0 16 16" className="size-3.5" fill="none">
+                <path d="M6 4h6v6M11.5 4.5L4 12" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </a>
+          )}
+          <button
+            type="button"
+            onClick={onAnother}
+            className="inline-flex h-11 items-center gap-2 rounded-[12px] border border-success/40 px-5 text-[14px] font-medium hover:bg-success/10 transition-colors"
+          >
+            Inserisci un'altra scheda
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

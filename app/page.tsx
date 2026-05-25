@@ -18,9 +18,9 @@ const forms = [
   {
     slug: "sopralluogo-termico",
     title: "Sopralluogo Termico",
-    description: "Scheda tecnica residenziale o business per impianto termico.",
-    status: "draft" as const,
-    accent: "amber" as const,
+    description: "Scheda tecnica per impianto termico residenziale.",
+    status: "ready" as const,
+    accent: "primary" as const,
   },
   {
     slug: "sopralluogo-copertura",
