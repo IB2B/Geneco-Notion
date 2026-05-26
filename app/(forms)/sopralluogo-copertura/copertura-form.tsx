@@ -275,7 +275,7 @@ export function CoperturaForm() {
           >
             <PreliminaryNotice />
             <Field
-              label="Commerciale che effettua la scheda"
+              label="Seleziona il commerciale che sta effettuando la scheda"
               required
               error={errors.commerciale?.message}
             >
@@ -326,7 +326,7 @@ export function CoperturaForm() {
             title="Dati tecnici della copertura"
             description="Rilievi su materiali, accessibilità, sicurezza e benefici fiscali."
           >
-            <SectionHeading>Edificio e copertura</SectionHeading>
+            <SectionHeading>Edificio e Copertura</SectionHeading>
             <div className="grid gap-5">
               {radioField("tipologiaEdificio", "Tipologia edificio", TIPOLOGIA_EDIFICIO_COPERTURA, {
                 required: true,
@@ -339,7 +339,7 @@ export function CoperturaForm() {
               )}
               <div className="grid gap-5 sm:grid-cols-2">
                 <Field
-                  label="Mq della copertura"
+                  label="Inserisci i mq della copertura"
                   required
                   error={errors.mqCopertura?.message}
                 >
@@ -354,8 +354,8 @@ export function CoperturaForm() {
                   )}
                 </Field>
                 <Field
-                  label="Altezza del piano di calpestio (m)"
-                  hint="Facoltativo"
+                  label="Altezza del piano di calpestio"
+                  hint="Facoltativo (m)"
                   error={errors.altezzaPianoCalpestio?.message}
                 >
                   {(props) => (
@@ -373,7 +373,7 @@ export function CoperturaForm() {
                 required: true,
                 columns: 1,
               })}
-              {checkboxField("strutturaPortante", "Struttura portante", STRUTTURA_PORTANTE, {
+              {checkboxField("strutturaPortante", "Struttura Portante", STRUTTURA_PORTANTE, {
                 required: true,
               })}
               {checkboxField(
@@ -392,10 +392,10 @@ export function CoperturaForm() {
               </div>
             </div>
 
-            <SectionHeading>Intervento previsto</SectionHeading>
+            <SectionHeading>Intervento Previsto</SectionHeading>
             <div className="grid gap-5">
-              {checkboxField("tipologiaIntervento", "Tipologia di intervento", TIPOLOGIA_INTERVENTO, {
-                hint: "Facoltativo",
+              {checkboxField("tipologiaIntervento", "Tipologia di copertura", TIPOLOGIA_INTERVENTO, {
+                hint: "Facoltativo — tipo di intervento sulla copertura",
               })}
               {checkboxField(
                 "tipologiaNuovaCopertura",
@@ -418,17 +418,17 @@ export function CoperturaForm() {
               {checkboxField("lattoneria", "Lattoneria", LATTONERIA, { hint: "Facoltativo" })}
             </div>
 
-            <SectionHeading>Coibentazione e amianto</SectionHeading>
+            <SectionHeading>Coibentazione e Amianto</SectionHeading>
             <div className="grid gap-5">
               {checkboxField(
                 "tipologiaLanaCoibentante",
-                "Presenza di lana coibentante",
+                "Tipologia di copertura lana coibentante",
                 SI_NO_DA_VERIFICARE,
                 { hint: "Facoltativo" },
               )}
               {checkboxField(
                 "presenzaControsoffittoAmianto",
-                "Presenza di controsoffitto in amianto",
+                "Presenza di controsoffitto in amianto?",
                 SI_NO_DA_VERIFICARE,
                 { hint: "Facoltativo" },
               )}
@@ -437,7 +437,7 @@ export function CoperturaForm() {
               })}
             </div>
 
-            <SectionHeading>Lucernari e punti luce</SectionHeading>
+            <SectionHeading>Lucernari e Punti Luce</SectionHeading>
             <div className="grid gap-5">
               {radioField("presenzaLucernari", "Presenza di lucernari", SI_NO, { required: true })}
               {checkboxField("materialeLucernari", "Materiale dei lucernari", MATERIALE_LUCERNARI, {
@@ -448,7 +448,7 @@ export function CoperturaForm() {
               })}
             </div>
 
-            <SectionHeading>Soletta e sotto-copertura</SectionHeading>
+            <SectionHeading>Soletta e Sotto-Copertura</SectionHeading>
             <div className="grid gap-5 sm:grid-cols-2">
               {radioField("edificioRiscaldato", "L'edificio sottostante è riscaldato?", SI_NO, {
                 required: true,
@@ -458,7 +458,7 @@ export function CoperturaForm() {
               {checkboxField("presenzaParapetti", "Presenza di parapetti", SI_NO, { hint: "Facoltativo" })}
             </div>
 
-            <SectionHeading>Accesso e sicurezza</SectionHeading>
+            <SectionHeading>Accesso e Sicurezza</SectionHeading>
             <div className="grid gap-5">
               {radioField("presenzaLineaVita", "Presenza di linea vita", SI_NO, { required: true })}
               {checkboxField("accessoCopertura", "Accesso alla copertura", SI_NO, { hint: "Facoltativo" })}
@@ -479,7 +479,7 @@ export function CoperturaForm() {
               )}
               {checkboxField(
                 "opereProvvisionali",
-                "Opere provvisionali di sicurezza",
+                "Opere Provvisionali di Sicurezza",
                 OPERE_PROVVISIONALI_COPERTURA,
                 { hint: "Facoltativo" },
               )}
@@ -488,16 +488,16 @@ export function CoperturaForm() {
               })}
             </div>
 
-            <SectionHeading>Benefici fiscali e disponibilità</SectionHeading>
+            <SectionHeading>Benefici Fiscali e Disponibilità</SectionHeading>
             <div className="grid gap-5">
               {checkboxField("bandoAmianto", "Bando Amianto", SI_NO, { hint: "Facoltativo" })}
               {checkboxField("detrazioniFiscali", "Detrazioni fiscali per cliente", SI_NO, {
                 hint: "Facoltativo",
               })}
-              {checkboxField("disponibilita", "Disponibilità di", DISPONIBILITA, { hint: "Facoltativo" })}
+              {checkboxField("disponibilita", "Disponibilità di:", DISPONIBILITA, { hint: "Facoltativo" })}
             </div>
 
-            <SectionHeading>Note e allegati</SectionHeading>
+            <SectionHeading>Note e Allegati</SectionHeading>
             <Field label="Note aggiuntive" hint="Facoltativo" error={errors.noteAggiuntive?.message}>
               {(props) => (
                 <Textarea

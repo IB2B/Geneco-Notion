@@ -186,7 +186,7 @@ export function FotovoltaicoForm() {
             description="Chi sta effettuando la scheda di sopralluogo."
           >
             <Field
-              label="Commerciale che effettua la scheda"
+              label="Seleziona il commerciale che sta effettuando la scheda"
               required
               error={errors.commerciale?.message}
             >
@@ -276,7 +276,7 @@ export function FotovoltaicoForm() {
                 name="tipoEdificio"
                 render={({ field }) => (
                   <Field
-                    label="Tipologia dell'edificio"
+                    label="Seleziona la tipologia dell'edificio"
                     required
                     error={errors.tipoEdificio?.message}
                     className="sm:col-span-2"
@@ -317,7 +317,7 @@ export function FotovoltaicoForm() {
                 name="geometriaCopertura"
                 render={({ field }) => (
                   <Field
-                    label="Geometria della copertura"
+                    label="Inserisci la Geometria della copertura"
                     required
                     error={errors.geometriaCopertura?.message}
                   >
@@ -339,7 +339,7 @@ export function FotovoltaicoForm() {
                 name="tipologiaCopertura"
                 render={({ field }) => (
                   <Field
-                    label="Tipologia di copertura"
+                    label="Inserisci la tipologia di copertura"
                     required
                     error={errors.tipologiaCopertura?.message}
                   >
@@ -361,7 +361,7 @@ export function FotovoltaicoForm() {
                 name="accessoTetto"
                 render={({ field }) => (
                   <Field
-                    label="Accesso al tetto"
+                    label="Inserisci l'accesso al tetto"
                     required
                     error={errors.accessoTetto?.message}
                     className="sm:col-span-2"
@@ -592,7 +592,7 @@ export function FotovoltaicoForm() {
 
               <div className="grid gap-5 sm:grid-cols-2">
                 <Field
-                  label="Nome del Decisore"
+                  label="Inserisci il nome del Decisore"
                   required
                   error={errors.nomeDecisore?.message}
                 >
@@ -600,7 +600,7 @@ export function FotovoltaicoForm() {
                 </Field>
 
                 <Field
-                  label="Nome della persona chiave"
+                  label="Inserisci il nome della persona chiave"
                   required
                   error={errors.nomePersonaChiave?.message}
                 >
@@ -609,7 +609,7 @@ export function FotovoltaicoForm() {
               </div>
 
               <Field
-                label="Nomi di eventuali collaboratori"
+                label="Inserisci i nomi di eventuali collaboratori"
                 hint="Se azienda — facoltativo"
                 error={errors.nomiCollaboratori?.message}
               >
@@ -620,7 +620,7 @@ export function FotovoltaicoForm() {
 
               <div className="grid gap-5 sm:grid-cols-2">
                 <Field
-                  label="Numero di soci"
+                  label="Inserisci il numero di soci"
                   hint="Facoltativo"
                   error={errors.numeroSoci?.message}
                 >
@@ -638,7 +638,7 @@ export function FotovoltaicoForm() {
                 </Field>
 
                 <Field
-                  label="Fatturato"
+                  label="Inserisci il Fatturato"
                   hint="Facoltativo (€)"
                   error={errors.fatturato?.message}
                 >
@@ -661,7 +661,7 @@ export function FotovoltaicoForm() {
                 name="percentualeSuccesso"
                 render={({ field }) => (
                   <Field
-                    label="% di successo"
+                    label="Inserisci la % di successo"
                     required
                     error={errors.percentualeSuccesso?.message}
                   >

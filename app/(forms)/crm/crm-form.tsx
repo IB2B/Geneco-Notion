@@ -159,7 +159,7 @@ export function CrmForm() {
             title="Riferimento Segnalatore"
             description="Compila il form per inserire un nuovo Lead. Tempo richiesto: meno di 1 minuto."
           >
-            <Field label="Seleziona il segnalatore" required error={errors.riferimentoSegnalatore?.message}>
+            <Field label="Riferimento Segnalatore" required error={errors.riferimentoSegnalatore?.message}>
               {(props) => (
                 <Select {...props} {...register("riferimentoSegnalatore")} defaultValue="">
                   <option value="" disabled>
@@ -182,7 +182,7 @@ export function CrmForm() {
               control={control}
               name="tipoContatto"
               render={({ field }) => (
-                <Field label="Privato o Azienda" required error={errors.tipoContatto?.message}>
+                <Field label="Che tipo di contatto è?" required error={errors.tipoContatto?.message}>
                   {() => (
                     <RadioGroup
                       name={field.name}
@@ -356,7 +356,7 @@ export function CrmForm() {
         {step === 7 && (
           <WizardStep stepNumber={7} totalSteps={TOTAL_STEPS} title="Commerciale di riferimento">
             <Field
-              label="Seleziona il commerciale di riferimento"
+              label="Selezione il commerciale di riferimento"
               required
               error={errors.commercialeRiferimento?.message}
             >
@@ -443,7 +443,7 @@ export function CrmForm() {
         {step === 11 && (
           <WizardStep stepNumber={11} totalSteps={TOTAL_STEPS} title="Dove ci ha conosciuto?">
             <Field
-              label="Seleziona la provenienza del lead"
+              label="Dove ci ha conosciuto?"
               required
               error={errors.doveCiHaConosciuto?.message}
             >
