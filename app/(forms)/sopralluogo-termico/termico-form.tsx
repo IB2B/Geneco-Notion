@@ -285,7 +285,7 @@ export function TermicoForm() {
             description="Chi sta effettuando la scheda di sopralluogo."
           >
             <Field
-              label="Commerciale che effettua la scheda"
+              label="Seleziona il commerciale che sta effettuando la scheda"
               required
               error={errors.commerciale?.message}
             >
@@ -343,7 +343,7 @@ export function TermicoForm() {
                 name="tipoEdificio"
                 render={({ field }) => (
                   <Field
-                    label="Tipologia di edificio"
+                    label="Indica la tipologia di edificio"
                     required
                     error={errors.tipoEdificio?.message}
                   >
@@ -365,7 +365,7 @@ export function TermicoForm() {
                 control={control}
                 name="interventiMigliorativi"
                 render={({ field }) => (
-                  <Field label="Interventi Migliorativi effettuati" hint="Facoltativo">
+                  <Field label="Interventi Migliorativi effettuati?" hint="Facoltativo">
                     {() => (
                       <CheckboxGrid
                         options={INTERVENTI_MIGLIORATIVI}
@@ -401,25 +401,25 @@ export function TermicoForm() {
 
             <SectionHeading>Abitazione</SectionHeading>
             <div className="grid gap-5 sm:grid-cols-2">
-              {numberField("mqPianoTerra", "Mq del Piano Terra", { required: true })}
-              {numberField("tempPianoTerra", "Temperatura °C del Piano Terra", { required: true })}
-              {numberField("mq1Piano", "Mq del 1° Piano", { placeholder: "Se non presente lasciare vuoto" })}
-              {numberField("temp1Piano", "Temperatura °C del 1° Piano", { placeholder: "Se non presente lasciare vuoto" })}
-              {numberField("mq2Piano", "Mq del 2° Piano", { placeholder: "Se non presente lasciare vuoto" })}
-              {numberField("temp2Piano", "Temperatura °C del 2° Piano", { placeholder: "Se non presente lasciare vuoto" })}
-              {numberField("mq3Piano", "Mq del 3° Piano", { placeholder: "Se non presente lasciare vuoto" })}
-              {numberField("temp3Piano", "Temperatura °C del 3° Piano", { placeholder: "Se non presente lasciare vuoto" })}
+              {numberField("mqPianoTerra", "Inserisci i mq del Piano Terra", { required: true })}
+              {numberField("tempPianoTerra", "Inserisci la temperatura in °C del Piano Terra", { required: true })}
+              {numberField("mq1Piano", "Inserisci i mq del 1° Piano", { placeholder: "Se non presente lasciare vuoto" })}
+              {numberField("temp1Piano", "Inserisci la temperatura in °C del 1° Piano", { placeholder: "Se non presente lasciare vuoto" })}
+              {numberField("mq2Piano", "Inserisci i mq del 2° Piano", { placeholder: "Se non presente lasciare vuoto" })}
+              {numberField("temp2Piano", "Inserisci la temperatura in °C del 2° Piano", { placeholder: "Se non presente lasciare vuoto" })}
+              {numberField("mq3Piano", "Inserisci i mq del 3° Piano", { placeholder: "Se non presente lasciare vuoto" })}
+              {numberField("temp3Piano", "Inserisci la temperatura in °C del 3° Piano", { placeholder: "Se non presente lasciare vuoto" })}
             </div>
 
-            <SectionHeading>Locali di servizio</SectionHeading>
-            <p className="-mt-2 mb-4 text-[12.5px] leading-4 text-fg-subtle">
-              Compila solo le zone riscaldate.
+            <SectionHeading>Locali di Servizio</SectionHeading>
+            <p className="-mt-2 mb-4 rounded-md bg-success-soft px-3 py-2 text-[12.5px] font-medium leading-4 text-success">
+              <span className="font-semibold">NOTA:</span> compilare solo le zone <span className="uppercase tracking-wide">riscaldate</span>, indicando temperatura e ambiente
             </p>
             <div className="grid gap-5 sm:grid-cols-2">
-              {numberField("mqSeminterrato", "Mq del Seminterrato", { placeholder: "Se non presente lasciare vuoto" })}
-              {numberField("tempSeminterrato", "Temperatura °C del Seminterrato", { placeholder: "Se non presente lasciare vuoto" })}
-              {numberField("mqGarage", "Mq del Garage/Magazzino", { placeholder: "Se non presente lasciare vuoto" })}
-              {numberField("tempGarage", "Temperatura °C del Garage/Magazzino", { placeholder: "Se non presente lasciare vuoto" })}
+              {numberField("mqSeminterrato", "Inserisci i mq del Seminterrato", { placeholder: "Se non presente lasciare vuoto" })}
+              {numberField("tempSeminterrato", "Inserisci la temperatura in °C del Seminterrato", { placeholder: "Se non presente lasciare vuoto" })}
+              {numberField("mqGarage", "Inserisci i mq del Garage/Magazzino", { placeholder: "Se non presente lasciare vuoto" })}
+              {numberField("tempGarage", "Inserisci la temperatura in °C del Garage/Magazzino", { placeholder: "Se non presente lasciare vuoto" })}
             </div>
             <div className="mt-5">{siNoField("altriLocaliPresenti", "Sono presenti altri locali?")}</div>
             <div className="mt-5 grid gap-5 sm:grid-cols-2">
@@ -437,27 +437,27 @@ export function TermicoForm() {
                   />
                 )}
               </Field>
-              {numberField("altriLocaliMq", "Mq del locale aggiuntivo", { placeholder: "Se non presente lasciare vuoto" })}
-              {numberField("altriLocaliTemp", "Temperatura °C del locale aggiuntivo", { placeholder: "Se non presente lasciare vuoto" })}
+              {numberField("altriLocaliMq", "Inserisci i mq del locale aggiuntivo", { placeholder: "Se no lasciare vuoto" })}
+              {numberField("altriLocaliTemp", "Inserisci la temperatura in °C del locale aggiuntivo", { placeholder: "Se no lasciare vuoto" })}
             </div>
 
-            <SectionHeading>Acqua calda sanitaria</SectionHeading>
+            <SectionHeading>Acqua Calda Sanitaria</SectionHeading>
             <div className="grid gap-5 sm:grid-cols-2">
-              {numberField("nBagni", "n° di Bagni", { required: true })}
-              {numberField("nResidenti", "n° di Residenti", { required: true })}
+              {numberField("nBagni", "Inserisci il n° di Bagni", { required: true })}
+              {numberField("nResidenti", "Inserisci il n° di Residenti", { required: true })}
               {siNoField("ospitiFrequenti", "Ci sono ospiti frequenti?")}
-              {siNoField("usoVasche", "Fanno uso di vasche?")}
-              {numberField("utilizzoVascheSett", "n° utilizzo vasche medio settimanale", { placeholder: "Se no inserire 0" })}
-              {siNoField("lavatriceAcs", "La lavatrice è collegata al sistema ACS?")}
-              {numberField("nLavatriceSett", "n° utilizzo settimanale lavatrice", { placeholder: "Se no inserire 0" })}
-              {siNoField("lavastoviglieAcs", "La lavastoviglie è collegata al sistema ACS?")}
-              {numberField("nLavastovigliaSett", "n° utilizzo settimanale lavastoviglie", { placeholder: "Se no inserire 0" })}
+              {siNoField("usoVasche", "Fanno uso di Vasche?")}
+              {numberField("utilizzoVascheSett", "Inserisci il n° di utilizzo vasche medio Settimanale", { placeholder: "Se no inserire 0" })}
+              {siNoField("lavatriceAcs", "La Lavatrice è collegata al sistema ACS?")}
+              {numberField("nLavatriceSett", "Inserisci il n° di utilizzo settimanale della lavatrice", { placeholder: "Se no inserire 0" })}
+              {siNoField("lavastoviglieAcs", "La Lavastoviglie è collegata al sistema ACS?")}
+              {numberField("nLavastovigliaSett", "Inserisci il n° di utilizzo settimanale della lavastoviglie", { placeholder: "Se no inserire 0" })}
             </div>
 
-            <SectionHeading>Impianto di riscaldamento principale</SectionHeading>
+            <SectionHeading>Impianto di Riscaldamento Principale</SectionHeading>
             <div className="grid gap-5 sm:grid-cols-2">
               <Field
-                label="Marca e Modello della Caldaia"
+                label="Inserisci Marca e Modello della Caldaia"
                 required
                 error={errors.caldaiaMarcaModello?.message}
                 className="sm:col-span-2"
@@ -467,10 +467,10 @@ export function TermicoForm() {
                 )}
               </Field>
               {siNoField("condensazione", "La caldaia è a condensazione?")}
-              {numberField("potenzaKw", "Potenza in kW", { required: true })}
-              {numberField("anno", "Anno", { required: true, placeholder: "2018" })}
+              {numberField("potenzaKw", "Inserisci la potenza in kW", { required: true })}
+              {numberField("anno", "Inserisci l'anno", { required: true, placeholder: "2018" })}
               <Field
-                label="Combustibile della caldaia"
+                label="Inserisci il combustibile della caldaia"
                 required
                 error={errors.combustibileCaldaia?.message}
               >
@@ -487,7 +487,7 @@ export function TermicoForm() {
                   </Select>
                 )}
               </Field>
-              {numberField("consumoCaldaia", "Consumo kg/litri 12 mesi", {
+              {numberField("consumoCaldaia", "Indica il consumo in kg o Litri in 12 mesi ( Se non è a Metano )", {
                 placeholder: "Se a Metano lasciare vuoto",
               })}
               <Controller
@@ -495,7 +495,7 @@ export function TermicoForm() {
                 name="sistemaEmissione"
                 render={({ field }) => (
                   <Field
-                    label="Sistema di emissione"
+                    label="Indica il sistema di emissione"
                     required
                     error={errors.sistemaEmissione?.message}
                     className="sm:col-span-2"
@@ -512,13 +512,13 @@ export function TermicoForm() {
                   </Field>
                 )}
               />
-              {numberField("nRadiatori", "n° di Radiatori", { placeholder: "Se non presente lasciare vuoto" })}
-              {numberField("coperturaRadiatoriMq", "Mq di copertura dei Radiatori", { placeholder: "Se non presente lasciare vuoto" })}
+              {numberField("nRadiatori", "Inserisci il numero di Radiatori", { placeholder: "Se non presente lasciare vuoto" })}
+              {numberField("coperturaRadiatoriMq", "Inserisci i mq di copertura dei Radiatori", { placeholder: "Se non presente lasciare vuoto" })}
               <Controller
                 control={control}
                 name="materialeRadiatori"
                 render={({ field }) => (
-                  <Field label="Materiale dei radiatori" hint="Facoltativo" className="sm:col-span-2">
+                  <Field label="Seleziona il materiale dei radiatori" hint="Facoltativo" className="sm:col-span-2">
                     {() => (
                       <CheckboxGrid
                         options={MATERIALE_RADIATORI}
@@ -531,19 +531,19 @@ export function TermicoForm() {
                   </Field>
                 )}
               />
-              {numberField("nFanCoil", "n° di Fan Coil", { placeholder: "Se non presente lasciare vuoto" })}
-              {numberField("coperturaFanCoilMq", "Mq di copertura dei Fan Coil", { placeholder: "Se non presente lasciare vuoto" })}
-              {numberField("superficiePavSoffittoMq", "Superficie pavimento/soffitto (mq)", { placeholder: "Se non presente lasciare vuoto" })}
+              {numberField("nFanCoil", "Inserisci il numero di Fan Coil", { placeholder: "Se non presente lasciare vuoto" })}
+              {numberField("coperturaFanCoilMq", "Inserisci i mq di copertura dei Fan Coil", { placeholder: "Se non presente lasciare vuoto" })}
+              {numberField("superficiePavSoffittoMq", "Inserisci la superficie dell'impianto a pavimento/soffitto (mq)", { placeholder: "Se non presente lasciare vuoto" })}
             </div>
 
-            <SectionHeading>Impianto di riscaldamento secondario</SectionHeading>
+            <SectionHeading>Impianto di Riscaldamento Secondario</SectionHeading>
             <div className="grid gap-5 sm:grid-cols-2">
-              {siNoField("generatoreBiomassa", "Generatore secondario a biomassa?")}
+              {siNoField("generatoreBiomassa", "Viene utilizzato un Generatore Secondario a Biomassa?")}
               <Controller
                 control={control}
                 name="tipologiaGen2"
                 render={({ field }) => (
-                  <Field label="Tipologia del generatore secondario" hint="Facoltativo">
+                  <Field label="Seleziona la tipologia del generatore secondario" hint="Facoltativo">
                     {() => (
                       <CheckboxGrid
                         options={TIPOLOGIA_GEN_2}
@@ -556,41 +556,41 @@ export function TermicoForm() {
                   </Field>
                 )}
               />
-              {numberField("superficie2Gen", "Superficie riscaldata dal 2° generatore (mq)", { placeholder: "Se non presente lasciare vuoto" })}
-              {numberField("consumoAnnuale2Gen", "Consumo annuale legna/pellet (kg)", { placeholder: "Se non presente lasciare vuoto" })}
+              {numberField("superficie2Gen", "Inserisci la superficie che riscalda il 2° Generatore", { placeholder: "Se non presente lasciare vuoto" })}
+              {numberField("consumoAnnuale2Gen", "Inserisci il consumo annuale di legna o pellet in kg", { placeholder: "Se non presente lasciare vuoto" })}
             </div>
 
-            <SectionHeading>Energia rinnovabile</SectionHeading>
+            <SectionHeading>Energia Rinnovabile</SectionHeading>
             <div className="grid gap-5 sm:grid-cols-2">
-              {siNoField("dispositiviRinnovabili", "Dispositivi di energia rinnovabile?")}
-              {numberField("pdcKw", "Pdc in kW", { placeholder: "Se non presente 0" })}
-              {numberField("scaldacquaPdcLitri", "Scaldacqua Pdc (litri)", { placeholder: "Se non presente 0" })}
-              {numberField("fotovoltaicoKwp", "Fotovoltaico kWp", { placeholder: "Se non presente 0" })}
-              {numberField("nPannelliSolari", "n° Pannelli Solari Termici", { placeholder: "Se non presente 0" })}
+              {siNoField("dispositiviRinnovabili", "Vengono utilizzati dispositivi di energia Rinnovabile?")}
+              {numberField("pdcKw", "Inserisci il Pdc in kW", { placeholder: "Se non presente lasciare vuoto o 0" })}
+              {numberField("scaldacquaPdcLitri", "Scaldacqua Pdc in litri", { placeholder: "Se non presente lasciare vuoto o 0" })}
+              {numberField("fotovoltaicoKwp", "Fotovoltaico kWp", { placeholder: "Se non presente lasciare vuoto o 0" })}
+              {numberField("nPannelliSolari", "Inserisci il n° di Pannelli Solari Termici", { placeholder: "Se non presente lasciare vuoto o 0" })}
               {siNoField("accumuloSolare", "È previsto accumulo solare?")}
-              {numberField("capacitaAccumulo", "Capacità accumulo (litri)", { placeholder: "Se non presente 0" })}
+              {numberField("capacitaAccumulo", "Inserisci la quantità di accumulo in litri", { placeholder: "Se non presente lasciare vuoto o 0" })}
             </div>
 
-            <SectionHeading>Centrale termica</SectionHeading>
+            <SectionHeading>Centrale Termica</SectionHeading>
             <div className="grid gap-5 sm:grid-cols-2">
-              {siNoField("centraleTermica", "È presente la centrale termica?")}
-              {numberField("mqCentrale", "Mq netti della centrale", { placeholder: "Se non presente 0" })}
+              {siNoField("centraleTermica", "È presente la Centrale termica")}
+              {numberField("mqCentrale", "Inserisci i mq netti della Centrale", { placeholder: "Se non presente lasciare vuoto o 0" })}
             </div>
 
-            <SectionHeading>Altre informazioni</SectionHeading>
+            <SectionHeading>Altre Informazioni</SectionHeading>
             <div className="grid gap-5 sm:grid-cols-2">
-              {siNoField("ambientiFreddi", "Ambienti freddi da migliorare?")}
-              {numberField("mqAmbientiFreddi", "Mq ambiente da migliorare", { placeholder: "Se non presente 0" })}
-              {numberField("tempAmbientiFreddi", "Temperatura attuale ambiente freddo (°C)", { placeholder: "Se non presente 0" })}
-              {siNoField("nuoviAmbienti", "Nuovi ambienti da riscaldare?")}
-              {numberField("mqNuoviAmbienti", "Mq dell'ambiente nuovo", { placeholder: "Se non presente 0" })}
-              {siNoField("nuoviAmbientiPredisposizione", "Predisposizione presente nei nuovi ambienti?")}
+              {siNoField("ambientiFreddi", "Ci sono ambienti freddi da migliorare?")}
+              {numberField("mqAmbientiFreddi", "Inserisci i mq dell'ambiente da migliorare", { placeholder: "Se non presente lasciare vuoto o 0" })}
+              {numberField("tempAmbientiFreddi", "Inserisci la temperatura attuale ambiente freddo interna in °C", { placeholder: "Se non presente lasciare vuoto o 0" })}
+              {siNoField("nuoviAmbienti", "Ci sono nuovi ambienti da riscaldare?")}
+              {numberField("mqNuoviAmbienti", "Inserisci i mq dell'ambiente nuovo", { placeholder: "Se non presente lasciare vuoto o 0" })}
+              {siNoField("nuoviAmbientiPredisposizione", "È già presente la predisposizione in questi nuovi ambienti?")}
             </div>
 
-            <SectionHeading>Boiler e induzione</SectionHeading>
+            <SectionHeading>Boiler e Induzione</SectionHeading>
             <div className="grid gap-5 sm:grid-cols-2">
               {siNoField("induzione", "È presente l'induzione?")}
-              {numberField("nUtilizziInduzione", "n° giornaliero utilizzo induzione", { placeholder: "Se non presente 0" })}
+              {numberField("nUtilizziInduzione", "Inserisci il numero giornaliero di utilizzo induzione", { placeholder: "Se non presente lasciare vuoto o 0" })}
               <Controller
                 control={control}
                 name="boilerElettrico"
