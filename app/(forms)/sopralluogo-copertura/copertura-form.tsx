@@ -641,7 +641,7 @@ function SuccessPanel({
             onClick={onAnother}
             className="inline-flex h-11 items-center gap-2 rounded-[12px] border border-success/40 px-5 text-[14px] font-medium hover:bg-success/10 transition-colors"
           >
-            Inserisci un'altra scheda
+            Inserisci un&apos;altra scheda
           </button>
         </div>
       </div>
