@@ -11,7 +11,12 @@ function unauthorized() {
 
 export function proxy(request: NextRequest) {
   const password = process.env.PREVIEW_PASSWORD;
-  if (!password) return NextResponse.next();
+  if (!password) {
+    return new NextResponse(
+      "Preview gate misconfigured: PREVIEW_PASSWORD env var is not set.",
+      { status: 503 },
+    );
+  }
 
   const header = request.headers.get("authorization");
   if (!header?.startsWith("Basic ")) return unauthorized();
