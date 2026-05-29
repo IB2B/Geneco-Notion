@@ -1,6 +1,5 @@
 export const termicoFormConfig = {
   slug: "sopralluogo-termico" as const,
-  databaseId: "b65a4836-6109-4b72-b4ea-ac729a8a8608",
   databaseLabel: "Schede S. Termico",
   titlePropertyName: "Nome e Cognome Cliente",
   pagePath: "/sopralluogo-termico",

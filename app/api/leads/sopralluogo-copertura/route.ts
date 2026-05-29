@@ -2,8 +2,8 @@ import type { NextRequest } from "next/server";
 import { ZodError } from "zod";
 import { notion } from "@/lib/notion/client";
 import { withNotionRetry } from "@/lib/notion/errors";
+import { env } from "@/lib/env";
 import { coperturaSchema } from "@/lib/forms/sopralluogo-copertura/schema";
-import { coperturaFormConfig } from "@/lib/forms/sopralluogo-copertura/config";
 import { coperturaToNotionProperties } from "@/lib/notion/adapters/sopralluogo-copertura";
 
 export const runtime = "nodejs";
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
   const properties = coperturaToNotionProperties(parsed.data);
   const result = await withNotionRetry(() =>
     notion().pages.create({
-      parent: { database_id: coperturaFormConfig.databaseId },
+      parent: { database_id: env.notionDbCopertura() },
       properties,
     }),
   );

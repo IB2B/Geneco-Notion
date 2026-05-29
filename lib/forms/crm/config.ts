@@ -1,6 +1,5 @@
 export const crmFormConfig = {
   slug: "crm" as const,
-  databaseId: "93928311-758d-471e-8e93-162195062f5b",
   databaseLabel: "CRM",
   titlePropertyName: "Nome e Cognome",
   pagePath: "/crm",

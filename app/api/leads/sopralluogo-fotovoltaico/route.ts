@@ -2,8 +2,8 @@ import type { NextRequest } from "next/server";
 import { ZodError } from "zod";
 import { notion } from "@/lib/notion/client";
 import { withNotionRetry } from "@/lib/notion/errors";
+import { env } from "@/lib/env";
 import { fotovoltaicoSchema } from "@/lib/forms/sopralluogo-fotovoltaico/schema";
-import { fotovoltaicoFormConfig } from "@/lib/forms/sopralluogo-fotovoltaico/config";
 import { fotovoltaicoToNotionProperties } from "@/lib/notion/adapters/sopralluogo-fotovoltaico";
 
 export const runtime = "nodejs";
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
   const properties = fotovoltaicoToNotionProperties(parsed.data);
   const result = await withNotionRetry(() =>
     notion().pages.create({
-      parent: { database_id: fotovoltaicoFormConfig.databaseId },
+      parent: { database_id: env.notionDbFotovoltaico() },
       properties,
     }),
   );

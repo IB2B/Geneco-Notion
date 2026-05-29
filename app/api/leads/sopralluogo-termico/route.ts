@@ -2,8 +2,8 @@ import type { NextRequest } from "next/server";
 import { ZodError } from "zod";
 import { notion } from "@/lib/notion/client";
 import { withNotionRetry } from "@/lib/notion/errors";
+import { env } from "@/lib/env";
 import { termicoSchema } from "@/lib/forms/sopralluogo-termico/schema";
-import { termicoFormConfig } from "@/lib/forms/sopralluogo-termico/config";
 import { termicoToNotionProperties } from "@/lib/notion/adapters/sopralluogo-termico";
 
 export const runtime = "nodejs";
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
   const properties = termicoToNotionProperties(parsed.data);
   const result = await withNotionRetry(() =>
     notion().pages.create({
-      parent: { database_id: termicoFormConfig.databaseId },
+      parent: { database_id: env.notionDbTermico() },
       properties,
     }),
   );

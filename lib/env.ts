@@ -12,4 +12,8 @@ function required(name: string): string {
 
 export const env = {
   notionToken: () => required("NOTION_TOKEN"),
+  notionDbCrm: () => required("NOTION_DB_CRM"),
+  notionDbFotovoltaico: () => required("NOTION_DB_FOTOVOLTAICO"),
+  notionDbTermico: () => required("NOTION_DB_TERMICO"),
+  notionDbCopertura: () => required("NOTION_DB_COPERTURA"),
 };

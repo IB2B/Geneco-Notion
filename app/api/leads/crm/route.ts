@@ -2,8 +2,8 @@ import type { NextRequest } from "next/server";
 import { ZodError } from "zod";
 import { notion } from "@/lib/notion/client";
 import { withNotionRetry } from "@/lib/notion/errors";
+import { env } from "@/lib/env";
 import { crmFormSchema } from "@/lib/forms/crm/schema";
-import { crmFormConfig } from "@/lib/forms/crm/config";
 import { crmToNotionProperties } from "@/lib/notion/adapters/crm";
 
 export const runtime = "nodejs";
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
   const properties = crmToNotionProperties(parsed.data);
   const result = await withNotionRetry(() =>
     notion().pages.create({
-      parent: { database_id: crmFormConfig.databaseId },
+      parent: { database_id: env.notionDbCrm() },
       properties,
     }),
   );
