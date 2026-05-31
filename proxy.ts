@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-const REALM = "Iniziativenergetiche — Anteprima";
+const REALM = "Iniziativenergetiche Preview";
 
 function unauthorized() {
   return new NextResponse("Authentication required", {
