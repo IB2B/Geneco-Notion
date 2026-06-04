@@ -1,7 +1,7 @@
 import type { CreatePageParameters } from "@notionhq/client/build/src/api-endpoints";
 import type { TermicoFormInput } from "@/lib/forms/sopralluogo-termico/schema";
 import { termicoFormConfig } from "@/lib/forms/sopralluogo-termico/config";
-import { lookupCommercialeId } from "@/lib/notion/commerciali";
+import { lookupCommercialeId, lookupCommercialeUserId } from "@/lib/notion/commerciali";
 
 const rt = (value: string | undefined) =>
   value ? [{ type: "text" as const, text: { content: value } }] : [];
@@ -26,11 +26,15 @@ export function termicoToNotionProperties(
   input: TermicoFormInput,
 ): CreatePageParameters["properties"] {
   const commercialeId = lookupCommercialeId(input.commerciale);
+  const commercialeUserId = lookupCommercialeUserId(input.commerciale);
   const props: Record<string, unknown> = {
     [termicoFormConfig.titlePropertyName]: {
       title: [{ type: "text", text: { content: input.nomeCognomeCliente } }],
     },
     ...(commercialeId ? { Commerciale: { relation: [{ id: commercialeId }] } } : {}),
+    ...(commercialeUserId
+      ? { "Account Commerciale": { people: [{ id: commercialeUserId }] } }
+      : {}),
 
     // Riscaldamento
     "Tipologia Edificio": { select: { name: input.tipoEdificio } },

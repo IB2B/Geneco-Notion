@@ -1,24 +1,29 @@
 import type { CreatePageParameters } from "@notionhq/client/build/src/api-endpoints";
 import type { CoperturaFormInput } from "@/lib/forms/sopralluogo-copertura/schema";
 import { coperturaFormConfig } from "@/lib/forms/sopralluogo-copertura/config";
+import { lookupCommercialeUserId } from "@/lib/notion/commerciali";
 
 const rt = (value: string | undefined) =>
   value ? [{ type: "text" as const, text: { content: value } }] : [];
 
-function buildNote(input: CoperturaFormInput): string {
+function buildNote(input: CoperturaFormInput, commercialeResolved: boolean): string {
   const lines: string[] = [];
   if (input.noteAggiuntive) lines.push(input.noteAggiuntive);
-  lines.push(`Commerciale: ${input.commerciale}`);
+  if (!commercialeResolved) lines.push(`Commerciale: ${input.commerciale}`);
   return lines.join("\n");
 }
 
 export function coperturaToNotionProperties(
   input: CoperturaFormInput,
 ): CreatePageParameters["properties"] {
+  const commercialeUserId = lookupCommercialeUserId(input.commerciale);
   const props: Record<string, unknown> = {
     [coperturaFormConfig.titlePropertyName]: {
       title: [{ type: "text", text: { content: input.nomeCognomeCliente } }],
     },
+    ...(commercialeUserId
+      ? { Commerciale: { people: [{ id: commercialeUserId }] } }
+      : {}),
 
     // Edificio + copertura
     "Tipologia edificio": { multi_select: [{ name: input.tipologiaEdificio }] },
@@ -108,7 +113,7 @@ export function coperturaToNotionProperties(
     },
 
     // Note bundle
-    "Note aggiuntive": { rich_text: rt(buildNote(input)) },
+    "Note aggiuntive": { rich_text: rt(buildNote(input, commercialeUserId !== null)) },
   };
 
   // Optional rich_text props

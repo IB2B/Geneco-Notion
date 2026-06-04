@@ -1,7 +1,7 @@
 import type { CreatePageParameters } from "@notionhq/client/build/src/api-endpoints";
 import type { CrmFormInput } from "@/lib/forms/crm/schema";
 import { crmFormConfig } from "@/lib/forms/crm/config";
-import { lookupCommercialeId } from "@/lib/notion/commerciali";
+import { lookupCommercialeId, lookupCommercialeUserId } from "@/lib/notion/commerciali";
 
 const rt = (value: string | undefined) =>
   value ? [{ type: "text" as const, text: { content: value } }] : [];
@@ -28,6 +28,7 @@ function toNotionDate(date: string, time: string): { start: string } {
 
 export function crmToNotionProperties(input: CrmFormInput): CreatePageParameters["properties"] {
   const commercialeId = lookupCommercialeId(input.commercialeRiferimento);
+  const commercialeUserId = lookupCommercialeUserId(input.commercialeRiferimento);
   const props: CreatePageParameters["properties"] = Object.freeze({
     // Title — the Notion DB title is "Nome e Cognome" (the title prop).
     // We use the referente name here, matching the existing Tally→Make mapping.
@@ -52,6 +53,9 @@ export function crmToNotionProperties(input: CrmFormInput): CreatePageParameters
     },
     ...(commercialeId
       ? { "Commerciale di riferimento": { relation: [{ id: commercialeId }] } }
+      : {}),
+    ...(commercialeUserId
+      ? { "Account Commerciale": { people: [{ id: commercialeUserId }] } }
       : {}),
     "Note Per Consulente": { rich_text: rt(buildNote(input, commercialeId !== null)) },
   });

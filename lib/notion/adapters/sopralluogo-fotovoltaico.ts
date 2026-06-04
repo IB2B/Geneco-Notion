@@ -1,7 +1,7 @@
 import type { CreatePageParameters } from "@notionhq/client/build/src/api-endpoints";
 import type { FotovoltaicoFormInput } from "@/lib/forms/sopralluogo-fotovoltaico/schema";
 import { fotovoltaicoFormConfig } from "@/lib/forms/sopralluogo-fotovoltaico/config";
-import { lookupCommercialeId } from "@/lib/notion/commerciali";
+import { lookupCommercialeId, lookupCommercialeUserId } from "@/lib/notion/commerciali";
 
 const rt = (value: string | undefined) =>
   value ? [{ type: "text" as const, text: { content: value } }] : [];
@@ -23,11 +23,15 @@ export function fotovoltaicoToNotionProperties(
   input: FotovoltaicoFormInput,
 ): CreatePageParameters["properties"] {
   const commercialeId = lookupCommercialeId(input.commerciale);
+  const commercialeUserId = lookupCommercialeUserId(input.commerciale);
   return Object.freeze({
     [fotovoltaicoFormConfig.titlePropertyName]: {
       title: [{ type: "text", text: { content: input.nomeCognomeCliente } }],
     },
     ...(commercialeId ? { Commerciale: { relation: [{ id: commercialeId }] } } : {}),
+    ...(commercialeUserId
+      ? { "Account Commerciale": { people: [{ id: commercialeUserId }] } }
+      : {}),
     "Mq. Copertura": { number: input.mqCopertura },
     "Tipo Edificio": { multi_select: [{ name: input.tipoEdificio }] },
     "Geometria Copertura": { select: { name: input.geometriaCopertura } },
