@@ -1,19 +1,19 @@
 import type { CreatePageParameters } from "@notionhq/client/build/src/api-endpoints";
 import type { TermicoFormInput } from "@/lib/forms/sopralluogo-termico/schema";
 import { termicoFormConfig } from "@/lib/forms/sopralluogo-termico/config";
+import { lookupCommercialeId } from "@/lib/notion/commerciali";
 
 const rt = (value: string | undefined) =>
   value ? [{ type: "text" as const, text: { content: value } }] : [];
 
-// Conditionally include a number property only when the value is defined.
 function num(value: number | undefined) {
   return value === undefined ? undefined : { number: value };
 }
 
-function buildNote(input: TermicoFormInput): string {
+function buildNote(input: TermicoFormInput, commercialeResolved: boolean): string {
   const lines: string[] = [];
   if (input.noteSopralluogo) lines.push(input.noteSopralluogo);
-  lines.push(`Commerciale: ${input.commerciale}`);
+  if (!commercialeResolved) lines.push(`Commerciale: ${input.commerciale}`);
   if (input.altriLocaliPresenti === "Si" && input.altriLocaliDescrizione) {
     lines.push(`Altro locale: ${input.altriLocaliDescrizione}`);
   }
@@ -25,10 +25,12 @@ function buildNote(input: TermicoFormInput): string {
 export function termicoToNotionProperties(
   input: TermicoFormInput,
 ): CreatePageParameters["properties"] {
+  const commercialeId = lookupCommercialeId(input.commerciale);
   const props: Record<string, unknown> = {
     [termicoFormConfig.titlePropertyName]: {
       title: [{ type: "text", text: { content: input.nomeCognomeCliente } }],
     },
+    ...(commercialeId ? { Commerciale: { relation: [{ id: commercialeId }] } } : {}),
 
     // Riscaldamento
     "Tipologia Edificio": { select: { name: input.tipoEdificio } },
@@ -88,7 +90,7 @@ export function termicoToNotionProperties(
     "Boiler Elettrico": { select: { name: input.boilerElettrico } },
 
     // Note Appuntamento
-    "Note Appuntamento": { rich_text: rt(buildNote(input)) },
+    "Note Appuntamento": { rich_text: rt(buildNote(input, commercialeId !== null)) },
   };
 
   // Optional numeric properties — only include when defined

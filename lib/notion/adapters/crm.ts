@@ -1,18 +1,19 @@
 import type { CreatePageParameters } from "@notionhq/client/build/src/api-endpoints";
 import type { CrmFormInput } from "@/lib/forms/crm/schema";
 import { crmFormConfig } from "@/lib/forms/crm/config";
+import { lookupCommercialeId } from "@/lib/notion/commerciali";
 
 const rt = (value: string | undefined) =>
   value ? [{ type: "text" as const, text: { content: value } }] : [];
 
 // Build a single rich_text block for Note Per Consulente that bundles:
 // - The free-form note from the form
-// - Commerciale di riferimento (until we wire the staff-DB relation lookup)
+// - Commerciale name as fallback when we can't resolve the relation page ID
 // - Nome di chi ha dato la referenza (until we wire Referenze relation lookup)
-function buildNote(input: CrmFormInput): string {
+function buildNote(input: CrmFormInput, commercialeResolved: boolean): string {
   const lines: string[] = [];
   if (input.note) lines.push(input.note);
-  lines.push(`Commerciale: ${input.commercialeRiferimento}`);
+  if (!commercialeResolved) lines.push(`Commerciale: ${input.commercialeRiferimento}`);
   if (input.nomeReferenza) lines.push(`Referenza: ${input.nomeReferenza}`);
   lines.push(`Tipo contatto: ${input.tipoContatto}`);
   return lines.join("\n");
@@ -26,6 +27,7 @@ function toNotionDate(date: string, time: string): { start: string } {
 }
 
 export function crmToNotionProperties(input: CrmFormInput): CreatePageParameters["properties"] {
+  const commercialeId = lookupCommercialeId(input.commercialeRiferimento);
   const props: CreatePageParameters["properties"] = Object.freeze({
     // Title — the Notion DB title is "Nome e Cognome" (the title prop).
     // We use the referente name here, matching the existing Tally→Make mapping.
@@ -48,7 +50,10 @@ export function crmToNotionProperties(input: CrmFormInput): CreatePageParameters
     "Impianto di interesse": {
       multi_select: (input.impiantiInteresse ?? []).map((name) => ({ name })),
     },
-    "Note Per Consulente": { rich_text: rt(buildNote(input)) },
+    ...(commercialeId
+      ? { "Commerciale di riferimento": { relation: [{ id: commercialeId }] } }
+      : {}),
+    "Note Per Consulente": { rich_text: rt(buildNote(input, commercialeId !== null)) },
   });
   return props;
 }

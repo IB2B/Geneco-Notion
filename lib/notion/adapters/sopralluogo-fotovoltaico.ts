@@ -1,20 +1,15 @@
 import type { CreatePageParameters } from "@notionhq/client/build/src/api-endpoints";
 import type { FotovoltaicoFormInput } from "@/lib/forms/sopralluogo-fotovoltaico/schema";
 import { fotovoltaicoFormConfig } from "@/lib/forms/sopralluogo-fotovoltaico/config";
+import { lookupCommercialeId } from "@/lib/notion/commerciali";
 
 const rt = (value: string | undefined) =>
   value ? [{ type: "text" as const, text: { content: value } }] : [];
 
-/**
- * Build the Note Appuntamento body. Bundles:
- * - free-form survey note
- * - Commerciale name (Notion DB has it as a relation; staff link manually until lookup wired)
- * - free-text overrides for "Altro" selections on Tipo Edificio / Locale Tecnico
- */
-function buildNote(input: FotovoltaicoFormInput): string {
+function buildNote(input: FotovoltaicoFormInput, commercialeResolved: boolean): string {
   const lines: string[] = [];
   if (input.noteSopralluogo) lines.push(input.noteSopralluogo);
-  lines.push(`Commerciale: ${input.commerciale}`);
+  if (!commercialeResolved) lines.push(`Commerciale: ${input.commerciale}`);
   if (input.tipoEdificio === "Altro" && input.tipoEdificioAltro) {
     lines.push(`Tipo edificio (Altro): ${input.tipoEdificioAltro}`);
   }
@@ -27,10 +22,12 @@ function buildNote(input: FotovoltaicoFormInput): string {
 export function fotovoltaicoToNotionProperties(
   input: FotovoltaicoFormInput,
 ): CreatePageParameters["properties"] {
+  const commercialeId = lookupCommercialeId(input.commerciale);
   return Object.freeze({
     [fotovoltaicoFormConfig.titlePropertyName]: {
       title: [{ type: "text", text: { content: input.nomeCognomeCliente } }],
     },
+    ...(commercialeId ? { Commerciale: { relation: [{ id: commercialeId }] } } : {}),
     "Mq. Copertura": { number: input.mqCopertura },
     "Tipo Edificio": { multi_select: [{ name: input.tipoEdificio }] },
     "Geometria Copertura": { select: { name: input.geometriaCopertura } },
@@ -52,6 +49,6 @@ export function fotovoltaicoToNotionProperties(
     ...(input.numeroSoci !== undefined ? { "Numero Soci": { number: input.numeroSoci } } : {}),
     ...(input.fatturato !== undefined ? { "Fatturato ": { number: input.fatturato } } : {}),
     "% di Successo": { number: Number(input.percentualeSuccesso) },
-    "Note Appuntamento": { rich_text: rt(buildNote(input)) },
+    "Note Appuntamento": { rich_text: rt(buildNote(input, commercialeId !== null)) },
   });
 }
