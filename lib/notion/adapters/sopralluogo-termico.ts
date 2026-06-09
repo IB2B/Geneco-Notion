@@ -10,6 +10,28 @@ function num(value: number | undefined) {
   return value === undefined ? undefined : { number: value };
 }
 
+type FileRef = { fileUploadId: string; filename: string };
+
+function filesProp(list: ReadonlyArray<FileRef> | undefined) {
+  if (!list || list.length === 0) return undefined;
+  return {
+    files: list.map((f) => ({
+      type: "file_upload" as const,
+      file_upload: { id: f.fileUploadId },
+      name: f.filename,
+    })),
+  };
+}
+
+function addFiles(
+  props: Record<string, unknown>,
+  notionPropertyName: string,
+  list: ReadonlyArray<FileRef> | undefined,
+) {
+  const v = filesProp(list);
+  if (v) props[notionPropertyName] = v;
+}
+
 function buildNote(input: TermicoFormInput, commercialeResolved: boolean): string {
   const lines: string[] = [];
   if (input.noteSopralluogo) lines.push(input.noteSopralluogo);
@@ -142,6 +164,20 @@ export function termicoToNotionProperties(
   if (input.altriLocaliPresenti === "Si" && input.altriLocaliDescrizione) {
     props["Descrizione Altro"] = { rich_text: rt(input.altriLocaliDescrizione) };
   }
+
+  addFiles(props, "Bolletta Energia Elettrica", input.uploadBollettaEnergiaElettrica);
+  addFiles(props, "Bolletta Gas", input.uploadBollettaGas);
+  addFiles(props, "Fatture Integrative 12 mesi", input.uploadFattureIntegrative12Mesi);
+  addFiles(props, "Fatture Integrative 12 mesi Biomassa", input.uploadFattureIntegrative12MesiBiomassa);
+  addFiles(props, "APE Documento", input.uploadApeDocumento);
+  addFiles(props, "Foto Esterne", input.uploadFotoEsterne);
+  addFiles(props, "Foto Serramenti", input.uploadFotoSerramenti);
+  addFiles(props, "Foto Radiatori", input.uploadFotoRadiatori);
+  addFiles(props, "Foto Caldaia", input.uploadFotoCaldaia);
+  addFiles(props, "Foto Targa Caldaia", input.uploadFotoTargaCaldaia);
+  addFiles(props, "Foto Centrale Termica", input.uploadFotoCentraleTermica);
+  addFiles(props, "Disegni e Planimetrie", input.uploadDisegniEPlanimetrie);
+  addFiles(props, "Centrale Termica File", input.uploadCentraleTermicaFile);
 
   return Object.freeze(props) as CreatePageParameters["properties"];
 }

@@ -6,6 +6,28 @@ import { lookupCommercialeId, lookupCommercialeUserId } from "@/lib/notion/comme
 const rt = (value: string | undefined) =>
   value ? [{ type: "text" as const, text: { content: value } }] : [];
 
+type FileRef = { fileUploadId: string; filename: string };
+
+function filesProp(list: ReadonlyArray<FileRef> | undefined) {
+  if (!list || list.length === 0) return undefined;
+  return {
+    files: list.map((f) => ({
+      type: "file_upload" as const,
+      file_upload: { id: f.fileUploadId },
+      name: f.filename,
+    })),
+  };
+}
+
+function addFiles(
+  props: Record<string, unknown>,
+  notionPropertyName: string,
+  list: ReadonlyArray<FileRef> | undefined,
+) {
+  const v = filesProp(list);
+  if (v) props[notionPropertyName] = v;
+}
+
 function buildNote(input: FotovoltaicoFormInput, commercialeResolved: boolean): string {
   const lines: string[] = [];
   if (input.noteSopralluogo) lines.push(input.noteSopralluogo);
@@ -24,7 +46,7 @@ export function fotovoltaicoToNotionProperties(
 ): CreatePageParameters["properties"] {
   const commercialeId = lookupCommercialeId(input.commerciale);
   const commercialeUserId = lookupCommercialeUserId(input.commerciale);
-  return Object.freeze({
+  const props: Record<string, unknown> = {
     [fotovoltaicoFormConfig.titlePropertyName]: {
       title: [{ type: "text", text: { content: input.nomeCognomeCliente } }],
     },
@@ -54,5 +76,17 @@ export function fotovoltaicoToNotionProperties(
     ...(input.fatturato !== undefined ? { "Fatturato ": { number: input.fatturato } } : {}),
     "% di Successo": { number: Number(input.percentualeSuccesso) },
     "Note Appuntamento": { rich_text: rt(buildNote(input, commercialeId !== null)) },
-  });
+  };
+
+  addFiles(props, "Bolletta", input.uploadBolletta);
+  addFiles(props, "Storico Annuo", input.uploadStoricoAnnuo);
+  addFiles(props, "Foto Interno Copertura", input.uploadFotoInternoCopertura);
+  addFiles(props, "Foto Esterno Copertura", input.uploadFotoEsternoCopertura);
+  addFiles(props, "Foto Esterni Edificio", input.uploadFotoEsterniEdificio);
+  addFiles(props, "Foto Possibile Locale Tecnico", input.uploadFotoPossibileLocaleTecnico);
+  addFiles(props, "Foto Quadri Elettrici", input.uploadFotoQuadriElettrici);
+  addFiles(props, "Foto Contatore", input.uploadFotoContatore);
+  addFiles(props, "Foto Cabina di Media", input.uploadFotoCabinaDiMedia);
+
+  return Object.freeze(props) as CreatePageParameters["properties"];
 }

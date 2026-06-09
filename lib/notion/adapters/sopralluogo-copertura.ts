@@ -6,6 +6,28 @@ import { lookupCommercialeUserId } from "@/lib/notion/commerciali";
 const rt = (value: string | undefined) =>
   value ? [{ type: "text" as const, text: { content: value } }] : [];
 
+type FileRef = { fileUploadId: string; filename: string };
+
+function filesProp(list: ReadonlyArray<FileRef> | undefined) {
+  if (!list || list.length === 0) return undefined;
+  return {
+    files: list.map((f) => ({
+      type: "file_upload" as const,
+      file_upload: { id: f.fileUploadId },
+      name: f.filename,
+    })),
+  };
+}
+
+function addFiles(
+  props: Record<string, unknown>,
+  notionPropertyName: string,
+  list: ReadonlyArray<FileRef> | undefined,
+) {
+  const v = filesProp(list);
+  if (v) props[notionPropertyName] = v;
+}
+
 function buildNote(input: CoperturaFormInput, commercialeResolved: boolean): string {
   const lines: string[] = [];
   if (input.noteAggiuntive) lines.push(input.noteAggiuntive);
@@ -132,6 +154,11 @@ export function coperturaToNotionProperties(
   if (input.altezzaPianoCalpestio !== undefined) {
     props["Altezza del piano di calpestio"] = { number: input.altezzaPianoCalpestio };
   }
+
+  addFiles(props, "Interno copertura", input.uploadInternoCopertura);
+  addFiles(props, "Esterno copertura", input.uploadEsternoCopertura);
+  addFiles(props, "Pareti esterne edificio", input.uploadParetiEsterneEdificio);
+  addFiles(props, "Area esterna edificio", input.uploadAreaEsternaEdificio);
 
   return Object.freeze(props) as CreatePageParameters["properties"];
 }

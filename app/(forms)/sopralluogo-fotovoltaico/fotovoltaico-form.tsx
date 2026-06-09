@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { Controller, useForm, type FieldPath } from "react-hook-form";
+import { Controller, useForm, type Control, type FieldPath } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Field } from "@/components/form/field";
 import { Input } from "@/components/ui/input";
@@ -27,6 +27,7 @@ import {
   type FotovoltaicoFormInput,
 } from "@/lib/forms/sopralluogo-fotovoltaico/schema";
 import { fotovoltaicoFormConfig } from "@/lib/forms/sopralluogo-fotovoltaico/config";
+import { FileUploadField } from "@/components/file-upload-field";
 
 const TOTAL_STEPS = 4;
 
@@ -102,6 +103,15 @@ export function FotovoltaicoForm() {
       numeroSoci: undefined,
       fatturato: undefined,
       percentualeSuccesso: undefined,
+      uploadBolletta: [],
+      uploadStoricoAnnuo: [],
+      uploadFotoInternoCopertura: [],
+      uploadFotoEsternoCopertura: [],
+      uploadFotoEsterniEdificio: [],
+      uploadFotoPossibileLocaleTecnico: [],
+      uploadFotoQuadriElettrici: [],
+      uploadFotoContatore: [],
+      uploadFotoCabinaDiMedia: [],
       honeypot: "",
     },
   });
@@ -507,7 +517,22 @@ export function FotovoltaicoForm() {
               )}
             </Field>
 
-            <FileUploadsDisabled />
+            <SectionHeading>Allegati foto e documenti</SectionHeading>
+            <p className="-mt-2 mb-4 text-[12.5px] text-fg-muted">
+              Carica foto e bollette. Massimo 4 MB per file (le foto vengono compresse
+              automaticamente). Più file per categoria sono ammessi.
+            </p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <UploadGroup control={control} name="uploadBolletta" label="Bolletta" accept="application/pdf,image/*" />
+              <UploadGroup control={control} name="uploadStoricoAnnuo" label="Storico Annuo" accept="application/pdf,image/*" />
+              <UploadGroup control={control} name="uploadFotoInternoCopertura" label="Foto Interno Copertura" />
+              <UploadGroup control={control} name="uploadFotoEsternoCopertura" label="Foto Esterno Copertura" />
+              <UploadGroup control={control} name="uploadFotoEsterniEdificio" label="Foto Esterni Edificio" />
+              <UploadGroup control={control} name="uploadFotoPossibileLocaleTecnico" label="Foto Possibile Locale Tecnico" />
+              <UploadGroup control={control} name="uploadFotoQuadriElettrici" label="Foto Quadri Elettrici" />
+              <UploadGroup control={control} name="uploadFotoContatore" label="Foto Contatore" />
+              <UploadGroup control={control} name="uploadFotoCabinaDiMedia" label="Foto Cabina di Media" />
+            </div>
           </WizardStep>
         )}
 
@@ -725,39 +750,41 @@ function SectionHeading({ children }: { children: ReactNode }) {
   );
 }
 
-function FileUploadsDisabled() {
-  const uploads = [
-    "Bolletta",
-    "Storico Annuo",
-    "Foto Interno Copertura",
-    "Foto Esterno Copertura",
-    "Foto Esterni Edificio",
-    "Foto Possibile Locale Tecnico",
-    "Foto Quadri Elettrici",
-    "Foto Contatore",
-    "Foto Cabina di Media",
-  ];
+type UploadFieldName =
+  | "uploadBolletta"
+  | "uploadStoricoAnnuo"
+  | "uploadFotoInternoCopertura"
+  | "uploadFotoEsternoCopertura"
+  | "uploadFotoEsterniEdificio"
+  | "uploadFotoPossibileLocaleTecnico"
+  | "uploadFotoQuadriElettrici"
+  | "uploadFotoContatore"
+  | "uploadFotoCabinaDiMedia";
+
+function UploadGroup({
+  control,
+  name,
+  label,
+  accept,
+}: {
+  control: Control<FotovoltaicoFormInput>;
+  name: UploadFieldName;
+  label: string;
+  accept?: string;
+}) {
   return (
-    <section className="mt-6 rounded-[14px] border border-dashed border-border-strong bg-surface-muted/70 px-5 py-5">
-      <h4 className="font-display text-[13px] font-semibold uppercase tracking-[0.12em] text-fg-muted">
-        Allegati foto e documenti — in arrivo
-      </h4>
-      <p className="mt-1.5 text-[13px] leading-5 text-fg-muted">
-        I 9 caricamenti foto/bolletta del modulo Tally saranno disponibili dopo
-        l&apos;attivazione dello storage esterno. Puoi caricarli manualmente nella
-        scheda Notion una volta salvata.
-      </p>
-      <ul className="mt-3 grid grid-cols-1 gap-1.5 text-[12.5px] text-fg-subtle sm:grid-cols-2">
-        {uploads.map((u) => (
-          <li key={u} className="flex items-center gap-2">
-            <svg aria-hidden viewBox="0 0 16 16" className="size-3.5" fill="none">
-              <path d="M3 8h10M8 3v10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-            {u}
-          </li>
-        ))}
-      </ul>
-    </section>
+    <Controller
+      control={control}
+      name={name as FieldPath<FotovoltaicoFormInput>}
+      render={({ field }) => (
+        <FileUploadField
+          label={label}
+          accept={accept}
+          value={(field.value as Array<{ fileUploadId: string; filename: string }>) ?? []}
+          onChange={(next) => field.onChange(next)}
+        />
+      )}
+    />
   );
 }
 

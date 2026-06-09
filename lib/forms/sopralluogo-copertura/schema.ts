@@ -180,6 +180,12 @@ function isFullName(value: string): boolean {
 const optionalText = (max = 1000) => z.string().trim().max(max).optional().or(z.literal(""));
 const optionalNumber = z.number().int().min(0).max(1_000_000).optional();
 
+const uploadedFile = z.object({
+  fileUploadId: z.string().uuid(),
+  filename: z.string().min(1).max(300),
+});
+const uploadList = z.array(uploadedFile).max(20).optional();
+
 export const coperturaSchema = z
   .object({
     // Step 1
@@ -251,6 +257,12 @@ export const coperturaSchema = z
 
     // Note
     noteAggiuntive: optionalText(2000),
+
+    // Allegati
+    uploadInternoCopertura: uploadList,
+    uploadEsternoCopertura: uploadList,
+    uploadParetiEsterneEdificio: uploadList,
+    uploadAreaEsternaEdificio: uploadList,
 
     // honeypot
     honeypot: z.string().optional(),

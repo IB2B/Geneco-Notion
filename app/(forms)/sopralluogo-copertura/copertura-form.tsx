@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { Controller, useForm, type FieldPath } from "react-hook-form";
+import { Controller, useForm, type Control, type FieldPath } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Field } from "@/components/form/field";
 import { Input } from "@/components/ui/input";
@@ -38,6 +38,7 @@ import {
   type CoperturaFormInput,
 } from "@/lib/forms/sopralluogo-copertura/schema";
 import { coperturaFormConfig } from "@/lib/forms/sopralluogo-copertura/config";
+import { FileUploadField } from "@/components/file-upload-field";
 
 const TOTAL_STEPS = 3;
 
@@ -135,6 +136,10 @@ export function CoperturaForm() {
       detrazioniFiscali: [],
       disponibilita: [],
       noteAggiuntive: "",
+      uploadInternoCopertura: [],
+      uploadEsternoCopertura: [],
+      uploadParetiEsterneEdificio: [],
+      uploadAreaEsternaEdificio: [],
       honeypot: "",
     },
   });
@@ -508,7 +513,17 @@ export function CoperturaForm() {
                 />
               )}
             </Field>
-            <FileUploadsDisabled />
+            <SectionHeading>Allegati foto</SectionHeading>
+            <p className="-mt-2 mb-4 text-[12.5px] text-fg-muted">
+              Carica le foto della copertura. Massimo 4 MB per file (le foto vengono compresse
+              automaticamente). Più file per categoria sono ammessi.
+            </p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <UploadGroup control={control} name="uploadInternoCopertura" label="Interno copertura" />
+              <UploadGroup control={control} name="uploadEsternoCopertura" label="Esterno copertura" />
+              <UploadGroup control={control} name="uploadParetiEsterneEdificio" label="Pareti esterne edificio" />
+              <UploadGroup control={control} name="uploadAreaEsternaEdificio" label="Area esterna edificio" />
+            </div>
           </WizardStep>
         )}
 
@@ -567,34 +582,36 @@ function SectionHeading({ children }: { children: ReactNode }) {
   );
 }
 
-function FileUploadsDisabled() {
-  const uploads = [
-    "Interno copertura",
-    "Esterno copertura",
-    "Pareti esterne edificio",
-    "Area esterna edificio",
-  ];
+type UploadFieldName =
+  | "uploadInternoCopertura"
+  | "uploadEsternoCopertura"
+  | "uploadParetiEsterneEdificio"
+  | "uploadAreaEsternaEdificio";
+
+function UploadGroup({
+  control,
+  name,
+  label,
+  accept,
+}: {
+  control: Control<CoperturaFormInput>;
+  name: UploadFieldName;
+  label: string;
+  accept?: string;
+}) {
   return (
-    <section className="mt-6 rounded-[14px] border border-dashed border-border-strong bg-surface-muted/70 px-5 py-5">
-      <h4 className="font-display text-[13px] font-semibold uppercase tracking-[0.12em] text-fg-muted">
-        Allegati foto — in arrivo
-      </h4>
-      <p className="mt-1.5 text-[13px] leading-5 text-fg-muted">
-        Gli upload foto del database Copertura saranno disponibili dopo
-        l&apos;attivazione dello storage esterno. Puoi caricarli manualmente
-        nella scheda Notion una volta salvata.
-      </p>
-      <ul className="mt-3 grid grid-cols-1 gap-1.5 text-[12.5px] text-fg-subtle sm:grid-cols-2">
-        {uploads.map((u) => (
-          <li key={u} className="flex items-center gap-2">
-            <svg aria-hidden viewBox="0 0 16 16" className="size-3.5" fill="none">
-              <path d="M3 8h10M8 3v10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-            {u}
-          </li>
-        ))}
-      </ul>
-    </section>
+    <Controller
+      control={control}
+      name={name as FieldPath<CoperturaFormInput>}
+      render={({ field }) => (
+        <FileUploadField
+          label={label}
+          accept={accept}
+          value={(field.value as Array<{ fileUploadId: string; filename: string }>) ?? []}
+          onChange={(next) => field.onChange(next)}
+        />
+      )}
+    />
   );
 }
 

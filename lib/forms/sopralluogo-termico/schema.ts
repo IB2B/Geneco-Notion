@@ -121,6 +121,12 @@ const optionalText = (max = 1000) => z.string().trim().max(max).optional().or(z.
 const optionalNumber = z.number().int().min(0).max(1_000_000).optional();
 const optionalSignedNumber = z.number().int().min(-50).max(100).optional();
 
+const uploadedFile = z.object({
+  fileUploadId: z.string().uuid(),
+  filename: z.string().min(1).max(300),
+});
+const uploadList = z.array(uploadedFile).max(20).optional();
+
 // ============================================================================
 // Schema — 3 wizard steps mirroring Tally 3EPrvN (page 4 is the thank-you)
 // ============================================================================
@@ -242,6 +248,21 @@ export const termicoSchema = z
       .trim()
       .min(2, "Inserisci una nota")
       .max(2000, "Massimo 2000 caratteri"),
+
+    // Allegati
+    uploadBollettaEnergiaElettrica: uploadList,
+    uploadBollettaGas: uploadList,
+    uploadFattureIntegrative12Mesi: uploadList,
+    uploadFattureIntegrative12MesiBiomassa: uploadList,
+    uploadApeDocumento: uploadList,
+    uploadFotoEsterne: uploadList,
+    uploadFotoSerramenti: uploadList,
+    uploadFotoRadiatori: uploadList,
+    uploadFotoCaldaia: uploadList,
+    uploadFotoTargaCaldaia: uploadList,
+    uploadFotoCentraleTermica: uploadList,
+    uploadDisegniEPlanimetrie: uploadList,
+    uploadCentraleTermicaFile: uploadList,
 
     // honeypot
     honeypot: z.string().optional(),

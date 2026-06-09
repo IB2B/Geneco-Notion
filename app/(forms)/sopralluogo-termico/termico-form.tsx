@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { Controller, useForm, type FieldPath } from "react-hook-form";
+import { Controller, useForm, type Control, type FieldPath } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Field } from "@/components/form/field";
 import { Input } from "@/components/ui/input";
@@ -28,6 +28,7 @@ import {
   type TermicoFormInput,
 } from "@/lib/forms/sopralluogo-termico/schema";
 import { termicoFormConfig } from "@/lib/forms/sopralluogo-termico/config";
+import { FileUploadField } from "@/components/file-upload-field";
 
 const TOTAL_STEPS = 3;
 
@@ -155,6 +156,19 @@ export function TermicoForm() {
       induzione: undefined,
       boilerElettrico: undefined,
       noteSopralluogo: "",
+      uploadBollettaEnergiaElettrica: [],
+      uploadBollettaGas: [],
+      uploadFattureIntegrative12Mesi: [],
+      uploadFattureIntegrative12MesiBiomassa: [],
+      uploadApeDocumento: [],
+      uploadFotoEsterne: [],
+      uploadFotoSerramenti: [],
+      uploadFotoRadiatori: [],
+      uploadFotoCaldaia: [],
+      uploadFotoTargaCaldaia: [],
+      uploadFotoCentraleTermica: [],
+      uploadDisegniEPlanimetrie: [],
+      uploadCentraleTermicaFile: [],
       honeypot: "",
     },
   });
@@ -631,7 +645,26 @@ export function TermicoForm() {
                 />
               )}
             </Field>
-            <FileUploadsDisabled />
+            <SectionHeading>Allegati foto e documenti</SectionHeading>
+            <p className="-mt-2 mb-4 text-[12.5px] text-fg-muted">
+              Carica foto e bollette. Massimo 4 MB per file (le foto vengono compresse
+              automaticamente). Più file per categoria sono ammessi.
+            </p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <UploadGroup control={control} name="uploadBollettaEnergiaElettrica" label="Bolletta Energia Elettrica" accept="application/pdf,image/*" />
+              <UploadGroup control={control} name="uploadBollettaGas" label="Bolletta Gas" accept="application/pdf,image/*" />
+              <UploadGroup control={control} name="uploadFattureIntegrative12Mesi" label="Fatture Integrative 12 mesi" accept="application/pdf,image/*" />
+              <UploadGroup control={control} name="uploadFattureIntegrative12MesiBiomassa" label="Fatture Integrative 12 mesi Biomassa" accept="application/pdf,image/*" />
+              <UploadGroup control={control} name="uploadApeDocumento" label="APE Documento" accept="application/pdf,image/*" />
+              <UploadGroup control={control} name="uploadFotoEsterne" label="Foto Esterne" />
+              <UploadGroup control={control} name="uploadFotoSerramenti" label="Foto Serramenti" />
+              <UploadGroup control={control} name="uploadFotoRadiatori" label="Foto Radiatori" />
+              <UploadGroup control={control} name="uploadFotoCaldaia" label="Foto Caldaia" />
+              <UploadGroup control={control} name="uploadFotoTargaCaldaia" label="Foto Targa Caldaia" />
+              <UploadGroup control={control} name="uploadFotoCentraleTermica" label="Foto Centrale Termica" />
+              <UploadGroup control={control} name="uploadDisegniEPlanimetrie" label="Disegni e Planimetrie" accept="application/pdf,image/*" />
+              <UploadGroup control={control} name="uploadCentraleTermicaFile" label="Centrale Termica File" accept="application/pdf,image/*" />
+            </div>
           </WizardStep>
         )}
 
@@ -678,43 +711,45 @@ function SectionHeading({ children }: { children: ReactNode }) {
   );
 }
 
-function FileUploadsDisabled() {
-  const uploads = [
-    "Bolletta Elettrica",
-    "Bolletta del Gas",
-    "Fatture integrative caldaia (12 mesi)",
-    "Fatture integrative 2° generatore",
-    "File APE - Legge 10",
-    "Foto Esterne",
-    "Foto Serramenti",
-    "Foto Radiatori",
-    "Foto Caldaia",
-    "Foto Targa Caldaia",
-    "Foto Cabina di Media",
-    "Foto Centrale Termica",
-    "Disegni e Planimetrie",
-  ];
+type UploadFieldName =
+  | "uploadBollettaEnergiaElettrica"
+  | "uploadBollettaGas"
+  | "uploadFattureIntegrative12Mesi"
+  | "uploadFattureIntegrative12MesiBiomassa"
+  | "uploadApeDocumento"
+  | "uploadFotoEsterne"
+  | "uploadFotoSerramenti"
+  | "uploadFotoRadiatori"
+  | "uploadFotoCaldaia"
+  | "uploadFotoTargaCaldaia"
+  | "uploadFotoCentraleTermica"
+  | "uploadDisegniEPlanimetrie"
+  | "uploadCentraleTermicaFile";
+
+function UploadGroup({
+  control,
+  name,
+  label,
+  accept,
+}: {
+  control: Control<TermicoFormInput>;
+  name: UploadFieldName;
+  label: string;
+  accept?: string;
+}) {
   return (
-    <section className="mt-6 rounded-[14px] border border-dashed border-border-strong bg-surface-muted/70 px-5 py-5">
-      <h4 className="font-display text-[13px] font-semibold uppercase tracking-[0.12em] text-fg-muted">
-        Allegati foto e documenti — in arrivo
-      </h4>
-      <p className="mt-1.5 text-[13px] leading-5 text-fg-muted">
-        I caricamenti foto/bolletta del modulo Tally saranno disponibili dopo
-        l&apos;attivazione dello storage esterno. Puoi caricarli manualmente nella
-        scheda Notion una volta salvata.
-      </p>
-      <ul className="mt-3 grid grid-cols-1 gap-1.5 text-[12.5px] text-fg-subtle sm:grid-cols-2">
-        {uploads.map((u) => (
-          <li key={u} className="flex items-center gap-2">
-            <svg aria-hidden viewBox="0 0 16 16" className="size-3.5" fill="none">
-              <path d="M3 8h10M8 3v10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            </svg>
-            {u}
-          </li>
-        ))}
-      </ul>
-    </section>
+    <Controller
+      control={control}
+      name={name as FieldPath<TermicoFormInput>}
+      render={({ field }) => (
+        <FileUploadField
+          label={label}
+          accept={accept}
+          value={(field.value as Array<{ fileUploadId: string; filename: string }>) ?? []}
+          onChange={(next) => field.onChange(next)}
+        />
+      )}
+    />
   );
 }
 

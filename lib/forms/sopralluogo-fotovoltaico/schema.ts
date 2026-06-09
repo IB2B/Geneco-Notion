@@ -132,6 +132,12 @@ function isFullName(value: string): boolean {
 const optional = (max = 300) => z.string().trim().max(max).optional().or(z.literal(""));
 const optionalText = (max = 1000) => z.string().trim().max(max).optional().or(z.literal(""));
 
+const uploadedFile = z.object({
+  fileUploadId: z.string().uuid(),
+  filename: z.string().min(1).max(300),
+});
+const uploadList = z.array(uploadedFile).max(20).optional();
+
 // ============================================================================
 // Schema — 4 wizard steps mirroring Tally 3qdexY (page 5 is the thank-you)
 // ============================================================================
@@ -209,6 +215,16 @@ export const fotovoltaicoSchema = z
     percentualeSuccesso: z.enum(PERCENTUALE_SUCCESSO, {
       message: "Seleziona la percentuale di successo",
     }),
+    // Allegati (Step 4) — ogni campo è opzionale, può contenere più file.
+    uploadBolletta: uploadList,
+    uploadStoricoAnnuo: uploadList,
+    uploadFotoInternoCopertura: uploadList,
+    uploadFotoEsternoCopertura: uploadList,
+    uploadFotoEsterniEdificio: uploadList,
+    uploadFotoPossibileLocaleTecnico: uploadList,
+    uploadFotoQuadriElettrici: uploadList,
+    uploadFotoContatore: uploadList,
+    uploadFotoCabinaDiMedia: uploadList,
     // honeypot
     honeypot: z.string().optional(),
   })
