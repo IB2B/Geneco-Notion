@@ -26,9 +26,6 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (parsed.data.honeypot) {
-    return json({ ok: true, accepted: true }, 200);
-  }
 
   const properties = fotovoltaicoToNotionProperties(parsed.data);
   const result = await withNotionRetry(() =>

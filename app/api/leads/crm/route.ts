@@ -27,10 +27,6 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (parsed.data.honeypot) {
-    // Silently accept to avoid signalling spam detection. Audit log entry omitted intentionally.
-    return json({ ok: true, accepted: true }, 200);
-  }
 
   const properties = crmToNotionProperties(parsed.data);
   const result = await withNotionRetry(() =>
