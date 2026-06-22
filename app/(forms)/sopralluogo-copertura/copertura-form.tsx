@@ -278,7 +278,6 @@ export function CoperturaForm() {
             title="Seleziona il commerciale"
             description="Chi sta effettuando la scheda di sopralluogo."
           >
-            <PreliminaryNotice />
             <Field
               label="Seleziona il commerciale che sta effettuando la scheda"
               required
@@ -551,18 +550,6 @@ export function CoperturaForm() {
         </div>
       )}
     </form>
-  );
-}
-
-function PreliminaryNotice() {
-  return (
-    <div className="mb-6 rounded-[12px] border border-warning/30 bg-warning-soft/70 px-4 py-3 text-[12.5px] leading-5 text-warning">
-      <strong className="font-semibold">Versione preliminare:</strong>{" "}
-      questo modulo è stato ricostruito dallo schema del database Notion
-      (non esiste un modulo Tally per la copertura). L&apos;elenco dei
-      campi è una proposta da verificare con il cliente — potrebbe
-      richiedere aggiunte o rimozioni.
-    </div>
   );
 }
 
