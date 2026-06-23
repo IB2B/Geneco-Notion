@@ -97,8 +97,51 @@ export function CrmForm() {
 
   async function next() {
     const fields = STEP_FIELDS[step - 1];
-    const ok = await trigger(fields, { shouldFocus: true });
-    if (!ok) return;
+
+    // 1) Per-field rules (z.string().min(), z.enum, regex, etc.)
+    const fieldOk = await trigger(fields, { shouldFocus: true });
+    if (!fieldOk) return;
+
+    // 2) Cross-field rules that the schema's .superRefine() can't surface
+    //    on a partially-filled form (Zod v4 short-circuits refinements when
+    //    other object fields still have errors). Mirror the schema's
+    //    conditional rules per-step manually.
+    const values = form.getValues();
+    const manualErrors: Array<[FieldPath<CrmFormInput>, string]> = [];
+
+    if (step === 3 && values.tipoContatto === "Azienda") {
+      if (!values.ragioneSociale?.trim()) {
+        manualErrors.push(["ragioneSociale", "Obbligatorio per Azienda"]);
+      }
+      if (!values.sedeLegaleAzienda?.trim()) {
+        manualErrors.push(["sedeLegaleAzienda", "Obbligatorio per Azienda"]);
+      }
+    }
+    if (
+      step === 11 &&
+      REFERENZA_TRIGGERS.includes(
+        values.doveCiHaConosciuto as (typeof REFERENZA_TRIGGERS)[number],
+      )
+    ) {
+      const ref = values.nomeReferenza?.trim() ?? "";
+      if (!ref) {
+        manualErrors.push(["nomeReferenza", "Indica chi ha dato la referenza"]);
+      } else if (!/\S\s+\S/.test(ref)) {
+        manualErrors.push([
+          "nomeReferenza",
+          "Inserisci nome e cognome completi",
+        ]);
+      }
+    }
+
+    if (manualErrors.length > 0) {
+      for (const [path, msg] of manualErrors) {
+        form.setError(path, { type: "manual", message: msg });
+      }
+      form.setFocus(manualErrors[0]![0]);
+      return;
+    }
+
     setStep((s) => Math.min(TOTAL_STEPS, s + 1));
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   }

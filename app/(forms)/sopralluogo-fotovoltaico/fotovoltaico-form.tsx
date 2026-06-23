@@ -135,6 +135,30 @@ export function FotovoltaicoForm() {
     const fields = STEP_FIELDS[step - 1];
     const ok = await trigger(fields, { shouldFocus: true });
     if (!ok) return;
+
+    // Cross-field rules the schema's .superRefine() can't surface while
+    // the form is still partially filled (Zod v4 short-circuits refinements
+    // when other object fields still have errors). Mirror them here.
+    const values = form.getValues();
+    const manualErrors: Array<[FieldPath<FotovoltaicoFormInput>, string]> = [];
+
+    if (step === 3) {
+      if (values.tipoEdificio === "Altro" && !values.tipoEdificioAltro?.trim()) {
+        manualErrors.push(["tipoEdificioAltro", "Specifica la tipologia di edificio"]);
+      }
+      if (values.localeTecnico === "Altro" && !values.localeTecnicoAltro?.trim()) {
+        manualErrors.push(["localeTecnicoAltro", "Specifica il locale tecnico"]);
+      }
+    }
+
+    if (manualErrors.length > 0) {
+      for (const [path, msg] of manualErrors) {
+        form.setError(path, { type: "manual", message: msg });
+      }
+      form.setFocus(manualErrors[0]![0]);
+      return;
+    }
+
     setStep((s) => Math.min(TOTAL_STEPS, s + 1));
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   }
