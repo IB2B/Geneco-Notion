@@ -20,11 +20,14 @@ function buildNote(input: CrmFormInput, commercialeResolved: boolean): string {
   return lines.join("\n");
 }
 
-// Combine separate date (YYYY-MM-DD) + time (HH:mm) into ISO 8601 with local TZ offset.
-// Italy is +01:00 (winter) / +02:00 (summer). For simplicity we emit naive local time
-// and rely on Notion to interpret it in workspace TZ.
-function toNotionDate(date: string, time: string): { start: string } {
-  return { start: `${date}T${time}:00` };
+// Combine separate date (YYYY-MM-DD) + time (HH:mm) into a Notion date value
+// pinned to Europe/Rome. The form collects appointment times in the user's
+// local time (Italy); without an explicit time_zone Notion interpreted the
+// naive string as UTC and the stored value shifted by the CET offset on
+// display. Setting time_zone makes the value DST-aware (CET in winter,
+// CEST in summer) and stable regardless of viewer location.
+function toNotionDate(date: string, time: string): { start: string; time_zone: string } {
+  return { start: `${date}T${time}:00`, time_zone: "Europe/Rome" };
 }
 
 export function crmToNotionProperties(input: CrmFormInput): CreatePageParameters["properties"] {
