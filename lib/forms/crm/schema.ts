@@ -166,24 +166,6 @@ export type TipoContatto = (typeof TIPO_CONTATTO)[number];
 // Validation helpers
 // ============================================================================
 
-/**
- * Validate the Italian P.IVA (Partita IVA) using the official checksum algorithm.
- * 11 digits where the last is a check digit computed with Luhn-like odd/even doubling.
- */
-export function isValidPIva(value: string): boolean {
-  if (!/^\d{11}$/.test(value)) return false;
-  let sum = 0;
-  for (let i = 0; i < 11; i++) {
-    let n = Number.parseInt(value[i]!, 10);
-    if (i % 2 === 1) {
-      n *= 2;
-      if (n > 9) n -= 9;
-    }
-    sum += n;
-  }
-  return sum % 10 === 0;
-}
-
 /** Strip phone formatting (spaces, dashes, dots, parentheses) and keep digits + optional leading +. */
 function normalisePhone(value: string): string {
   return value.replace(/[\s\-.() ]/g, "");
@@ -300,7 +282,8 @@ export const crmFormSchema = z
   })
   .strict()
   .superRefine((data, ctx) => {
-    // Azienda branch: ragione sociale, sede legale, P.IVA all required + P.IVA checksum
+    // Azienda branch: ragione sociale, sede legale required. P.IVA stays fully optional
+    // (client request — empty or any value is accepted, no format check).
     if (data.tipoContatto === "Azienda") {
       if (!data.ragioneSociale)
         ctx.addIssue({
@@ -314,25 +297,6 @@ export const crmFormSchema = z
           path: ["sedeLegaleAzienda"],
           message: "Obbligatorio per Azienda",
         });
-      if (!data.pIva) {
-        ctx.addIssue({
-          code: "custom",
-          path: ["pIva"],
-          message: "Obbligatorio per Azienda",
-        });
-      } else if (!/^\d{11}$/.test(data.pIva)) {
-        ctx.addIssue({
-          code: "custom",
-          path: ["pIva"],
-          message: "La P.IVA deve essere di 11 cifre",
-        });
-      } else if (!isValidPIva(data.pIva)) {
-        ctx.addIssue({
-          code: "custom",
-          path: ["pIva"],
-          message: "P.IVA non valida (checksum errato)",
-        });
-      }
     }
     // Referenza name required when "Referenziato da cliente" is chosen
     if (REFERENZA_TRIGGERS.includes(data.doveCiHaConosciuto)) {

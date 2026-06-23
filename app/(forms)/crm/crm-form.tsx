@@ -252,7 +252,10 @@ export function CrmForm() {
                       />
                     )}
                   </Field>
-                  <Field label="Inserisci P.IVA" required error={errors.pIva?.message}>
+                  <Field
+                    label="P.IVA (facoltativa)"
+                    error={errors.pIva?.message}
+                  >
                     {(props) => (
                       <Input
                         {...props}
