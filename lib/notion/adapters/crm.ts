@@ -2,6 +2,7 @@ import type { CreatePageParameters } from "@notionhq/client/build/src/api-endpoi
 import type { CrmFormInput } from "@/lib/forms/crm/schema";
 import { crmFormConfig } from "@/lib/forms/crm/config";
 import { lookupCommercialeId, lookupCommercialeUserId } from "@/lib/notion/commerciali";
+import { normalizeItalianPhone } from "@/lib/utils/phone";
 
 const rt = (value: string | undefined) =>
   value ? [{ type: "text" as const, text: { content: value } }] : [];
@@ -40,7 +41,7 @@ export function crmToNotionProperties(input: CrmFormInput): CreatePageParameters
     "Sede Legale Azienda": { rich_text: rt(input.sedeLegaleAzienda || undefined) },
     "P.Iva": { rich_text: rt(input.pIva || undefined) },
     "Email": { email: input.email },
-    "Numero di telefono": { phone_number: input.telefono },
+    "Numero di telefono": { phone_number: normalizeItalianPhone(input.telefono) },
     "Indirizzo": { rich_text: rt(input.indirizzoInstallazione) },
     "Città": { rich_text: rt(input.citta) },
     "CAP": { number: Number(input.cap) },
