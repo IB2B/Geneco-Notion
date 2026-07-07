@@ -48,6 +48,8 @@ export const COMMERCIALE_COPERTURA = [
   "Daniele Tuffanelli",
   "Cannizzaro Alessio",
   "Mormandi Leonardo",
+  "Tuzza Erik",
+  "Colombo Luca",
 ] as const;
 
 export const TIPOLOGIA_EDIFICIO_COPERTURA = [
