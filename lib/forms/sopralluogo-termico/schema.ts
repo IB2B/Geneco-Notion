@@ -68,6 +68,9 @@ export const COMMERCIALE_TERMICO = [
   "Moles Chiara",
   "Spatafora Martina",
   "Mormandi Leonardo",
+  "Salvadore Matteo",
+  "Gnuva Alberto",
+  "Bellati Giuseppe",
 ] as const;
 
 export const TIPO_EDIFICIO_TERMICO = [

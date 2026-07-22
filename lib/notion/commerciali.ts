@@ -65,6 +65,9 @@ const CONSULENTE_PAGE_ID: Record<string, string> = {
   "Malagutti Gabriele": "e5e2b8d4-7353-4288-97eb-9839795b6965",
   "Gabriele Malagutti": "e5e2b8d4-7353-4288-97eb-9839795b6965",
   "Cornolti Fabrizio": "10c76cd0-4b67-804a-8ba4-ec998f20f0c1",
+  "Salvadore Matteo": "39676cd0-4b67-80ab-80ae-c63489ba1ac1",
+  "Gnuva Alberto": "39c76cd0-4b67-800c-bd6b-e20083bbffd8",
+  "Bellati Giuseppe": "3a076cd0-4b67-8026-8e58-df27c3b1aa3a",
 };
 
 const NOTION_USER_ID: Record<string, string> = {
@@ -114,6 +117,7 @@ const NOTION_USER_ID: Record<string, string> = {
   "Malagutti Gabriele": "455c4256-aae8-48f2-813d-e484c2ce4006",
   "Gabriele Malagutti": "455c4256-aae8-48f2-813d-e484c2ce4006",
   "Cornolti Fabrizio": "10bd872b-594c-814f-ae3c-0002da746b34",
+  "Gnuva Alberto": "39cd872b-594c-8106-95e2-00027cca1171",
 };
 
 // Form-dropdown names that have no Consulente DB record — relation stays empty,
@@ -148,6 +152,8 @@ export const CONSULENTI_WITHOUT_USER_ACCOUNT: ReadonlyArray<string> = [
   "Kreslikova Zuzana",
   "Menescalchi Maurizio Massimo",
   "Luise Diego",
+  "Salvadore Matteo",
+  "Bellati Giuseppe",
 ];
 
 export function lookupCommercialeId(name: string | undefined | null): string | null {

@@ -105,6 +105,9 @@ export const COMMERCIALE_RIFERIMENTO = [
   "Moles Chiara",
   "Spatafora Martina",
   "Mormandi Leonardo",
+  "Salvadore Matteo",
+  "Gnuva Alberto",
+  "Bellati Giuseppe",
 ] as const;
 
 export const IMPIANTI_INTERESSE = [

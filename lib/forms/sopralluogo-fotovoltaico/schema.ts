@@ -69,6 +69,9 @@ export const COMMERCIALE_FOTOVOLTAICO = [
   "Moles Chiara",
   "Spatafora Martina",
   "Mormandi Leonardo",
+  "Salvadore Matteo",
+  "Gnuva Alberto",
+  "Bellati Giuseppe",
 ] as const;
 
 export const TIPO_EDIFICIO = [
